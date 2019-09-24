@@ -1,0 +1,5 @@
+.task
+*.coverprofile
+*.out
+*.so
+.idea
