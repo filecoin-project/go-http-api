@@ -4,14 +4,19 @@ import (
 	"context"
 	"fmt"
 	"github.com/carbonfive/go-filecoin-rest-api/handlers"
+	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 	"reflect"
+	"time"
 )
 
 const DefaultPort = ":8080"
 
 // V1Callbacks is a struct for callbacks configurable for the given API endpoint,
 // shown by the 'path' tag
+// Implemented as a struct so that consumers can opt out of some callbacks, providing only
+// those they need to use.
 type V1Callbacks struct {
 	NodeID func() (string, error)                                  `path:"node_id"`
 	Block  func(cid string, msgs bool, rcpts bool) (string, error) `path:"block"`
@@ -21,15 +26,15 @@ type V1Callbacks struct {
 type HTTPAPI struct {
 	ctx   context.Context
 	srv   *http.Server
-	smux  *http.ServeMux
+	gmux  *mux.Router
 	hello http.Handler
 	v1cb  *V1Callbacks
 }
 
-// NewHTTPServer creates and returns a *HTTPAPI using the provided context, *V1Callbacks,
+// NewHTTPAPI creates and returns a *HTTPAPI using the provided context, *V1Callbacks,
 // and desired port. If port <= 0, port 8080 will be used.
-func NewHTTPServer(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
-	smux := http.NewServeMux()
+func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
+	gmux := mux.NewRouter()
 
 	lport := DefaultPort
 	if port > 0 {
@@ -38,13 +43,15 @@ func NewHTTPServer(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
 
 	s := &http.Server{
 		Addr:    lport,
-		Handler: smux,
+		Handler: gmux,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
 	}
 
 	return &HTTPAPI{
 		ctx:   ctx,
 		srv:   s,
-		smux:  smux,
+		gmux:  gmux,
 		hello: &handlers.HelloHandler{},
 		v1cb:  cb1,
 	}
@@ -52,7 +59,7 @@ func NewHTTPServer(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
 
 // Run sets up the route handlers using the provided callbacks, and starts
 // the HTTP API server.
-func (s *HTTPAPI) Run() error {
+func (s *HTTPAPI) Run() {
 	// TODO make this a documented connection check
 	s.AddHandler("/hello", s.hello)
 
@@ -78,7 +85,11 @@ func (s *HTTPAPI) Run() error {
 		}
 	}
 
-	return s.srv.ListenAndServe()
+	go func() {
+		if err := s.srv.ListenAndServe(); err != nil {
+			log.Println(err)
+		}
+	}()
 }
 
 // Shutdown shuts down the http.Server.
@@ -88,5 +99,5 @@ func (s *HTTPAPI) Shutdown() error {
 
 // AddHandler adds the handler to the http.Server's ServeMux
 func (s *HTTPAPI) AddHandler(path string, hdlr http.Handler) {
-	s.smux.Handle(path, hdlr)
+	s.gmux.PathPrefix(path).Handler(hdlr)
 }

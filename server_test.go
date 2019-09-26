@@ -10,19 +10,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
-	"time"
 )
 
 func TestHTTPServer_Hello(t *testing.T) {
 	port, err := test.GetFreePort()
 	require.NoError(t, err)
-	s := server.NewHTTPServer(context.Background(), &server.V1Callbacks{}, port)
-	go func() {
-		require.NoError(t, s.Run())
-		defer func() {
-			require.NoError(t, s.Shutdown())
-		}()
-	}()
+	s := server.NewHTTPAPI(context.Background(), &server.V1Callbacks{}, port)
+	s.Run()
 
 	uri := fmt.Sprintf("http://localhost:%d/hello", port)
 	resp, err := http.Get(uri)
@@ -37,13 +31,8 @@ func TestHTTPServer_Hello(t *testing.T) {
 
 func TestNewHTTPServer(t *testing.T) {
 	t.Run("if port is <=0 the default of :8080 will be used.", func(t *testing.T) {
-		s := server.NewHTTPServer(context.Background(), &server.V1Callbacks{}, 0)
-		go func() {
-			require.NoError(t, s.Run())
-			defer func() {
-				require.NoError(t, s.Shutdown())
-			}()
-		}()
+		s := server.NewHTTPAPI(context.Background(), &server.V1Callbacks{}, 0)
+		s.Run()
 
 		resp, err := http.Get("http://localhost:8080/hello")
 		require.NoError(t, err)
@@ -60,13 +49,8 @@ func TestHTTPServer_Run(t *testing.T) {
 	t.Run("calls default handler if no callback was provided", func(t *testing.T) {
 		port, err := test.GetFreePort()
 		require.NoError(t, err)
-		s := server.NewHTTPServer(context.Background(), &server.V1Callbacks{}, port)
-		go func() {
-			require.NoError(t, s.Run())
-			defer func() {
-				require.NoError(t, s.Shutdown())
-			}()
-		}()
+		s := server.NewHTTPAPI(context.Background(), &server.V1Callbacks{}, port)
+		s.Run()
 
 		uri := fmt.Sprintf("http://localhost:%d/node_id", port)
 		resp, err := http.Get(uri)
@@ -85,14 +69,8 @@ func TestHTTPServer_Run(t *testing.T) {
 
 		port, err := test.GetFreePort()
 		require.NoError(t, err)
-		s := server.NewHTTPServer(context.Background(), &server.V1Callbacks{NodeID: nidcb}, port)
-		go func() {
-			require.NoError(t, s.Run())
-			defer func() {
-				require.NoError(t, s.Shutdown())
-			}()
-		}()
-		time.Sleep(1)
+		s := server.NewHTTPAPI(context.Background(), &server.V1Callbacks{NodeID: nidcb}, port)
+		s.Run()
 
 		uri := fmt.Sprintf("http://localhost:%d/node_id", port)
 		resp, err := http.Get(uri)
@@ -104,4 +82,12 @@ func TestHTTPServer_Run(t *testing.T) {
 		body, err := ioutil.ReadAll(resp.Body)
 		assert.Equal(t, "1234abcd", string(body[:]))
 	})
+}
+
+func TestReflections(t *testing.T) {
+	type foo struct {
+		bar func(int)
+		bazz func(string)
+	}
+
 }
