@@ -18,8 +18,10 @@ func TestHTTPServer_Hello(t *testing.T) {
 	require.NoError(t, err)
 	s := server.NewHTTPServer(context.Background(), &server.V1Callbacks{}, port)
 	go func() {
-		s.Run()
-		defer s.Shutdown()
+		require.NoError(t, s.Run())
+		defer func() {
+			require.NoError(t, s.Shutdown())
+		}()
 	}()
 
 	uri := fmt.Sprintf("http://localhost:%d/hello", port)
@@ -33,14 +35,37 @@ func TestHTTPServer_Hello(t *testing.T) {
 	assert.Equal(t, "/hello, world!", string(body[:]))
 }
 
+func TestNewHTTPServer(t *testing.T) {
+	t.Run("if port is <=0 the default of :8080 will be used.", func(t *testing.T) {
+		s := server.NewHTTPServer(context.Background(), &server.V1Callbacks{}, 0)
+		go func() {
+			require.NoError(t, s.Run())
+			defer func() {
+				require.NoError(t, s.Shutdown())
+			}()
+		}()
+
+		resp, err := http.Get("http://localhost:8080/hello")
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, resp.Body.Close())
+		}()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		assert.Equal(t, "/hello, world!", string(body[:]))
+	})
+}
+
 func TestHTTPServer_Run(t *testing.T) {
 	t.Run("calls default handler if no callback was provided", func(t *testing.T) {
 		port, err := test.GetFreePort()
 		require.NoError(t, err)
 		s := server.NewHTTPServer(context.Background(), &server.V1Callbacks{}, port)
 		go func() {
-			s.Run()
-			defer s.Shutdown()
+			require.NoError(t, s.Run())
+			defer func() {
+				require.NoError(t, s.Shutdown())
+			}()
 		}()
 
 		uri := fmt.Sprintf("http://localhost:%d/node_id", port)
@@ -62,8 +87,10 @@ func TestHTTPServer_Run(t *testing.T) {
 		require.NoError(t, err)
 		s := server.NewHTTPServer(context.Background(), &server.V1Callbacks{NodeID: nidcb}, port)
 		go func() {
-			s.Run()
-			defer s.Shutdown()
+			require.NoError(t, s.Run())
+			defer func() {
+				require.NoError(t, s.Shutdown())
+			}()
 		}()
 		time.Sleep(1)
 
