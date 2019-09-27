@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/carbonfive/go-filecoin-rest-api/handlers"
+	"github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -15,11 +15,10 @@ const DefaultPort = ":8080"
 
 // V1Callbacks is a struct for callbacks configurable for the given API endpoint,
 // shown by the 'path' tag
-// Implemented as a struct so that consumers can opt out of some callbacks, providing only
-// those they need to use.
 type V1Callbacks struct {
-	NodeID func() (string, error)                                  `path:"node_id"`
-	Block  func(cid string, msgs bool, rcpts bool) (string, error) `path:"block"`
+	Actor func(string) ([]byte, error) `path:"/actors/{actorId}"`
+	Block func(string) ([]byte, error) `path:"/chain/blocks/{blockId}"`
+	Node  func() ([]byte, error)       `path:"/control/node"`
 }
 
 // HTTPAPI is a struct containing all the things needed to serve the Filecoin HTTP API
@@ -35,6 +34,7 @@ type HTTPAPI struct {
 // and desired port. If port <= 0, port 8080 will be used.
 func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
 	gmux := mux.NewRouter()
+	gmux.PathPrefix("/api/filecoin/v1")
 
 	lport := DefaultPort
 	if port > 0 {
@@ -42,8 +42,8 @@ func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
 	}
 
 	s := &http.Server{
-		Addr:    lport,
-		Handler: gmux,
+		Addr:         lport,
+		Handler:      gmux,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 	}
@@ -52,7 +52,7 @@ func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
 		ctx:   ctx,
 		srv:   s,
 		gmux:  gmux,
-		hello: &handlers.HelloHandler{},
+		hello: &v1.HelloHandler{},
 		v1cb:  cb1,
 	}
 }
@@ -75,11 +75,13 @@ func (s *HTTPAPI) Run() {
 		if path, ok := field.Tag.Lookup("path"); ok {
 
 			if cb1v.Field(i).IsNil() {
-				s.AddHandler("/"+path, &handlers.DefaultHandler{})
+				s.AddHandler(path, &v1.DefaultHandler{})
 			} else {
 				switch path {
-				case "node_id":
-					s.AddHandler("/"+path, &handlers.NodeID{Callback: s.v1cb.NodeID})
+				case "/actors/{actorId}":
+					s.AddHandler(path, &v1.Actor{Callback: s.v1cb.Actor})
+				case "/control/node":
+					s.AddHandler(path, &v1.Node{Callback: s.v1cb.Node})
 				}
 			}
 		}
@@ -98,6 +100,7 @@ func (s *HTTPAPI) Shutdown() error {
 }
 
 // AddHandler adds the handler to the http.Server's ServeMux
+// r.Path("/products/{key}").Handler(ProductsHandler)
 func (s *HTTPAPI) AddHandler(path string, hdlr http.Handler) {
-	s.gmux.PathPrefix(path).Handler(hdlr)
+	s.gmux.Path(path).Handler(hdlr)
 }

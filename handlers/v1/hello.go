@@ -1,4 +1,4 @@
-package handlers
+package v1
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ type HelloHandler struct {
 }
 
 func (hh *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if _, err  := fmt.Fprintf(w, "%s, world!", html.EscapeString(r.RequestURI)); err != nil {
+	if _, err := fmt.Fprintf(w, "%s, world!", html.EscapeString(r.RequestURI)); err != nil {
 		log.Error(err)
 	}
 }
