@@ -2,7 +2,7 @@ package v1
 
 import (
 	"fmt"
-	"github.com/carbonfive/go-filecoin-rest-api/handlers"
+	"github.com/carbonfive/go-filecoin-rest-api/handlers/api_errors"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -18,9 +18,7 @@ func (a *Actor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
-		// add to JSON error struct, return that
-		fmt.Fprint(w, handlers.MarshalError(err)) // nolint: errcheck
-		return
+		result = api_errors.MarshalErrors([]string{err.Error()})
 	}
 
 	fmt.Fprint(w, string(result[:])) // nolint: errcheck

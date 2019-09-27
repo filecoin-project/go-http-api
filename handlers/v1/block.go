@@ -2,12 +2,13 @@ package v1
 
 import (
 	"fmt"
+	"github.com/carbonfive/go-filecoin-rest-api/handlers/api_errors"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
 type Block struct {
-	Callback func(blockId string) (json string, err error)
+	Callback func(blockId string) (json []byte, err error)
 }
 
 func (b *Block) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -16,7 +17,7 @@ func (b *Block) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	result, err := b.Callback(vars["blockId"])
 
 	if err != nil {
-		// add to JSON error struct, print that
+		result = api_errors.MarshalErrors([]string{err.Error()})
 	}
 	w.WriteHeader(http.StatusOK)
 

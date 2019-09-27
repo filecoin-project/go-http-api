@@ -2,34 +2,14 @@ package server_test
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	server "github.com/carbonfive/go-filecoin-rest-api"
 	"github.com/carbonfive/go-filecoin-rest-api/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
-	"math/big"
 	"net/http"
 	"testing"
 )
-
-func TestHTTPServer_Hello(t *testing.T) {
-	port, err := test.GetFreePort()
-	require.NoError(t, err)
-	s := server.NewHTTPAPI(context.Background(), &server.V1Callbacks{}, port)
-	s.Run()
-
-	uri := fmt.Sprintf("http://localhost:%d/hello", port)
-	resp, err := http.Get(uri)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, resp.Body.Close())
-	}()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	assert.Equal(t, "/hello, world!", string(body[:]))
-}
 
 func TestNewHTTPServer(t *testing.T) {
 	t.Run("if port is <=0 the default of :8080 will be used.", func(t *testing.T) {
@@ -43,30 +23,37 @@ func TestNewHTTPServer(t *testing.T) {
 		}()
 
 		body, err := ioutil.ReadAll(resp.Body)
+		require.NoError(t, err)
 		assert.Equal(t, "/hello, world!", string(body[:]))
 	})
 }
 
 func TestHTTPServer_Run(t *testing.T) {
-	t.Run("calls default handler if no callback was provided", func(t *testing.T) {
-		port := requireGetFreePort(t)
+	t.Run("basic hello returns good response", func(t *testing.T) {
+		port, err := test.GetFreePort()
+		require.NoError(t, err)
 		server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{},
 			port).
 			Run()
 
-		uri := fmt.Sprintf("http://localhost:%d/control/node", port)
-		resp, err := http.Get(uri)
-		require.NoError(t, err)
-		defer func() {
-			require.NoError(t, resp.Body.Close())
-		}()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		assert.Equal(t, "/control/node is not implemented", string(body[:]))
+		exp := []byte("/hello, world!")
+		test.AssertResponseBody(t, port, "/hello", exp)
 	})
+
+	t.Run("calls default handler if no callback was provided", func(t *testing.T) {
+		port := test.RequireGetFreePort(t)
+		server.NewHTTPAPI(context.Background(),
+			&server.V1Callbacks{},
+			port).
+			Run()
+
+		exp := []byte("/control/node is not implemented")
+		test.AssertResponseBody(t, port, "/control/node", exp)
+	})
+
 	t.Run("calls correct handler if a callback for it was provided", func(t *testing.T) {
-		port := requireGetFreePort(t)
+		port := test.RequireGetFreePort(t)
 
 		exp := []byte("abcd123")
 
@@ -79,54 +66,22 @@ func TestHTTPServer_Run(t *testing.T) {
 			port).
 			Run()
 
-		assertResponseBody(t, port, "/control/node", exp)
+		test.AssertResponseBody(t, port, "/control/node", exp)
 	})
 
-	t.Run("Actor route accepts an id", func(t *testing.T) {
-		type FakeActor struct {
-			ActorType string
-			Address   string
-			Nonce     uint64
-			Balance   big.Int
-		}
+	t.Run("returns 404 when a path does not match required param", func(t *testing.T) {
+		port := test.RequireGetFreePort(t)
 
-		fa := FakeActor{
-			ActorType: "account",
-			Address:   "abcd123",
-			Nonce:     123434,
-			Balance:   *big.NewInt(600),
-		}
-		fajson, _ := json.Marshal(fa)
 		acb := func(actorId string) ([]byte, error) {
-			resp, _ := json.Marshal(fa)
+			resp := []byte("doesn't matter")
 			return resp, nil
 		}
 
-		port := requireGetFreePort(t)
 		server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{Actor: acb},
 			port).
 			Run()
 
-		assertResponseBody(t, port, "actors/1111", fajson)
+		test.AssertResponseBody(t, port, "actors/", []byte("404 page not found\n"))
 	})
-}
-
-func requireGetFreePort(t *testing.T) int {
-	port, err := test.GetFreePort()
-	require.NoError(t, err)
-	return port
-}
-
-func assertResponseBody(t *testing.T, port int, path string, exp []byte) {
-	uri := fmt.Sprintf("http://localhost:%d/%s", port, path)
-	resp, err := http.Get(uri)
-	require.NoError(t, err)
-	defer func() {
-		require.NoError(t, resp.Body.Close())
-	}()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	assert.Equal(t, exp, body)
-
 }
