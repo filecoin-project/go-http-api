@@ -39,7 +39,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 			port).
 			Run()
 
-		test.AssertResponseBody(t, port, "actors/1111", fajson)
+		test.AssertResponseBody(t, port, "actors/1111", string(fajson[:]))
 	})
 
 	t.Run("Errors are put into errors array", func(t *testing.T) {
@@ -57,7 +57,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 			port).
 			Run()
 
-		test.AssertResponseBody(t, port, "actors/1111", errs)
+		test.AssertResponseBody(t, port, "actors/1111", string(errs[:]))
 
 	})
 

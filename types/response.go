@@ -1,5 +1,5 @@
 package types
 
-type APIResponse struct {
+type APIErrorResponse struct {
 	Errors []string `json:"errors,omitEmpty"`
 }

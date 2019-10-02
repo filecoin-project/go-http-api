@@ -3,19 +3,16 @@ package v1
 import (
 	"fmt"
 	"github.com/carbonfive/go-filecoin-rest-api/handlers/api_errors"
-	"github.com/gorilla/mux"
 	"net/http"
 )
 
-type Actor struct {
-	Callback func(actorId string) (json []byte, err error)
+type Actors struct {
+	Callback func() (json []byte, err error)
 }
 
 // ServeHTTP handles an HTTP request.
-func (a *Actor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	result, err := a.Callback(vars["actorId"])
+func (a *Actors) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	result, err := a.Callback()
 
 	w.WriteHeader(http.StatusOK)
 	if err != nil {

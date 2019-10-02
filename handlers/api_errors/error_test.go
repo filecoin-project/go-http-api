@@ -11,7 +11,7 @@ import (
 func TestMarshalErrors(t *testing.T) {
 	msgs := []string{"a", "b"}
 
-	testErr := types.APIResponse{Errors: msgs}
+	testErr := types.APIErrorResponse{Errors: msgs}
 
 	testErrJSON, _ := json.Marshal(testErr)
 

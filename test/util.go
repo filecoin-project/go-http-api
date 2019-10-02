@@ -32,8 +32,8 @@ func RequireGetFreePort(t *testing.T) int {
 	return port
 }
 
-func AssertResponseBody(t *testing.T, port int, path string, exp []byte) {
-	uri := fmt.Sprintf("http://localhost:%d/%s", port, path)
+func AssertResponseBody(t *testing.T, port int, path string, exp string) {
+	uri := fmt.Sprintf("http://localhost:%d/api/filecoin/v1/%s", port, path)
 	resp, err := http.Get(uri)
 	require.NoError(t, err)
 	defer func() {
@@ -42,6 +42,5 @@ func AssertResponseBody(t *testing.T, port int, path string, exp []byte) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	require.NoError(t, err)
-	assert.Equal(t, exp, body)
-
+	assert.Equal(t, exp, string(body[:]))
 }

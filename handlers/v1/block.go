@@ -11,6 +11,7 @@ type Block struct {
 	Callback func(blockId string) (json []byte, err error)
 }
 
+// ServeHTTP handles an HTTP request.
 func (b *Block) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 

@@ -10,6 +10,7 @@ import (
 type HelloHandler struct {
 }
 
+// ServeHTTP handles an HTTP request.
 func (hh *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if _, err := fmt.Fprintf(w, "%s, world!", html.EscapeString(r.RequestURI)); err != nil {
 		fmt.Fprint(w, api_errors.MarshalErrors([]string{err.Error()})) // nolint: errcheck
