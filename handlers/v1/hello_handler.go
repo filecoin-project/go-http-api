@@ -2,7 +2,7 @@ package v1
 
 import (
 	"fmt"
-	"github.com/carbonfive/go-filecoin-rest-api/handlers/api_errors"
+	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
 	"html"
 	"net/http"
 )

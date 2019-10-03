@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
+	"github.com/carbonfive/go-filecoin-rest-api/types"
 	"github.com/go-chi/chi"
 	"github.com/gorilla/mux"
 	"log"
@@ -17,10 +18,10 @@ const DefaultPort = ":8080"
 // V1Callbacks is a struct for callbacks configurable for the given API endpoint,
 // shown by the 'path' tag
 type V1Callbacks struct {
-	Actor  func(string) ([]byte, error)
-	Actors func() ([]byte, error)
-	Block  func(string) ([]byte, error)
-	Node   func() ([]byte, error)
+	GetActorByID func(string) (*types.Actor, error)
+	GetActors    func() ([]byte, error)
+	GetBlockByID func(string) ([]byte, error)
+	GetNode      func() ([]byte, error)
 }
 
 // HTTPAPI is a struct containing all the things needed to serve the Filecoin HTTP API
@@ -81,10 +82,10 @@ func (s *HTTPAPI) Route() {
 		// TODO make this a documented connection check
 		r.Handle("/hello", s.hello)
 
-		r.Get("/control/node", hdls["Node"].ServeHTTP)
+		r.Get("/control/node", hdls["GetNode"].ServeHTTP)
 		r.Route("/actors", func(r chi.Router) {
-			r.Get("/", hdls["Actors"].ServeHTTP)
-			r.Get("/{actorId}", hdls["Actor"].ServeHTTP)
+			r.Get("/", hdls["GetActors"].ServeHTTP)
+			r.Get("/{actorId}", hdls["GetActorByID"].ServeHTTP)
 		})
 	})
 }
@@ -116,12 +117,12 @@ func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {
 			handlers[fieldName] = &v1.DefaultHandler{}
 		} else {
 			switch fieldName {
-			case "Actors":
-				handlers[fieldName] = &v1.Actors{Callback: cb.Actors}
-			case "Actor":
-				handlers[fieldName] = &v1.Actor{Callback: cb.Actor}
-			case "Node":
-				handlers[fieldName] = &v1.Node{Callback: cb.Node}
+			case "GetActors":
+				handlers[fieldName] = &v1.ActorsHandler{Callback: cb.GetActors}
+			case "GetActorByID":
+				handlers[fieldName] = &v1.ActorHandler{Callback: cb.GetActorByID}
+			case "GetNode":
+				handlers[fieldName] = &v1.NodeHandler{Callback: cb.GetNode}
 			default:
 				handlers[fieldName] = &v1.DefaultHandler{}
 			}

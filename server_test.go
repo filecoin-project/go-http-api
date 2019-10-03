@@ -56,7 +56,7 @@ func TestHTTPServer_Run(t *testing.T) {
 		}
 
 		server.NewHTTPAPI(context.Background(),
-			&server.V1Callbacks{Node: nidcb},
+			&server.V1Callbacks{GetNode: nidcb},
 			port).
 			Run()
 
@@ -66,13 +66,8 @@ func TestHTTPServer_Run(t *testing.T) {
 	t.Run("returns 404 when a path does not match", func(t *testing.T) {
 		port := test.RequireGetFreePort(t)
 
-		acb := func(actorId string) ([]byte, error) {
-			resp := []byte("doesn't matter")
-			return resp, nil
-		}
-
 		server.NewHTTPAPI(context.Background(),
-			&server.V1Callbacks{Actor: acb},
+			&server.V1Callbacks{},
 			port).
 			Run()
 
