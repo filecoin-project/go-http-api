@@ -1,10 +1,12 @@
 package types
 
 import (
-	"github.com/ipfs/go-cid"
 	"math/big"
+
+	"github.com/ipfs/go-cid"
 )
 
+// BlockHeader is the struct for a Filecoin blockheader
 type BlockHeader struct {
 	Miner                 string    `json:"minerAddress"`
 	Tickets               [][]byte  `json:"tickets"`

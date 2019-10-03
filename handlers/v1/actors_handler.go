@@ -2,10 +2,12 @@ package v1
 
 import (
 	"fmt"
-	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
 	"net/http"
+
+	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
 )
 
+// ActorsHandler is the handler for the actors endpoint
 type ActorsHandler struct {
 	Callback func() (json []byte, err error)
 }

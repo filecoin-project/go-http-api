@@ -2,10 +2,12 @@ package api_errors_test
 
 import (
 	"encoding/json"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/carbonfive/go-filecoin-rest-api/types"
 	. "github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestMarshalErrors(t *testing.T) {

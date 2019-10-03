@@ -5,14 +5,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
+	"testing"
+
+	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/require"
+
 	server "github.com/carbonfive/go-filecoin-rest-api"
 	"github.com/carbonfive/go-filecoin-rest-api/test"
 	"github.com/carbonfive/go-filecoin-rest-api/types"
 	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
-	"github.com/magiconair/properties/assert"
-	"github.com/stretchr/testify/require"
-	"math/big"
-	"testing"
 )
 
 func TestActor_ServeHTTP(t *testing.T) {

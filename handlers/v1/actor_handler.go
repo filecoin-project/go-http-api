@@ -3,13 +3,15 @@ package v1
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+
 	"github.com/carbonfive/go-filecoin-rest-api/types"
 	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
-	"github.com/gorilla/mux"
-	"net/http"
 )
 
-// ActorHandler is a handler for the Actor endpoint
+// ActorHandler is a handler for the actors/{actorId} endpoint
 type ActorHandler struct {
 	Callback func(actorId string) (*types.Actor, error)
 }

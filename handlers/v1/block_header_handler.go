@@ -3,10 +3,12 @@ package v1
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+
 	"github.com/carbonfive/go-filecoin-rest-api/types"
 	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
-	"github.com/gorilla/mux"
-	"net/http"
 )
 
 // BlockHeaderHandler is a handler for the blockheader endpoint

@@ -2,6 +2,7 @@ package api_errors
 
 import (
 	"encoding/json"
+
 	"github.com/carbonfive/go-filecoin-rest-api/types"
 )
 

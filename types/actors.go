@@ -1,8 +1,9 @@
 package types
 
 import (
-	"github.com/ipfs/go-cid"
 	"math/big"
+
+	"github.com/ipfs/go-cid"
 )
 
 type readableFunctionSignature struct {
@@ -10,7 +11,7 @@ type readableFunctionSignature struct {
 	Return []string `json:"return"`
 }
 
-// V1 Actor
+// Actor is a struct for a Filecoin actor
 type Actor struct {
 	ActorType string                               `json:"actorType"`
 	Address   string                               `json:"address"`

@@ -2,14 +2,15 @@ package test
 
 import (
 	"fmt"
-	"github.com/ipfs/go-cid"
-	"github.com/multiformats/go-multihash"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"testing"
+
+	"github.com/ipfs/go-cid"
+	"github.com/multiformats/go-multihash"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // GetFreePort gets a free port from the kernel

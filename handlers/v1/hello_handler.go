@@ -2,11 +2,14 @@ package v1
 
 import (
 	"fmt"
-	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
 	"html"
 	"net/http"
+
+	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
 )
 
+// HelloHandler is a handler for the hello endpoint.
+// It is intended to test connection to the API
 type HelloHandler struct {
 }
 

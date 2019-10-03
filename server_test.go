@@ -2,10 +2,12 @@ package server_test
 
 import (
 	"context"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	server "github.com/carbonfive/go-filecoin-rest-api"
 	"github.com/carbonfive/go-filecoin-rest-api/test"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 //func TestRoutes(t *testing.T) {

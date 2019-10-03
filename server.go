@@ -3,14 +3,16 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
-	"github.com/carbonfive/go-filecoin-rest-api/types"
-	"github.com/go-chi/chi"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"reflect"
 	"time"
+
+	"github.com/go-chi/chi"
+	"github.com/gorilla/mux"
+
+	"github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
+	"github.com/carbonfive/go-filecoin-rest-api/types"
 )
 
 const DefaultPort = ":8080"
@@ -100,8 +102,8 @@ func (s *HTTPAPI) Router() chi.Router {
 	return s.chimux
 }
 
-// SetupV1Handlers takes a V1Callback struct and creates a handler,
-// setting the callback for each
+// SetupV1Handlers takes a V1Callback struct and iterates over all
+// functions, creating a handler with a callback for each supported endpoint.
 func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {
 	cb1t := reflect.TypeOf(*cb)
 	cb1v := reflect.ValueOf(*cb)
