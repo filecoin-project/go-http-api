@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
+	"github.com/carbonfive/go-filecoin-rest-api/types"
 )
 
 // NodeHandler is the handler for the control/node endpoint
@@ -16,7 +16,7 @@ func (nid *NodeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	result, err := nid.Callback()
 
 	if err != nil {
-		result = api_errors.MarshalErrors([]string{err.Error()})
+		result = types.MarshalErrors([]string{err.Error()})
 	}
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, string(result[:])) // nolint: errcheck

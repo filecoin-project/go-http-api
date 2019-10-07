@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
+	"github.com/carbonfive/go-filecoin-rest-api/types"
 )
 
 // ActorsHandler is the handler for the actors endpoint
@@ -18,7 +18,7 @@ func (a *ActorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	if err != nil {
-		result = api_errors.MarshalErrors([]string{err.Error()})
+		result = types.MarshalErrors([]string{err.Error()})
 	}
 
 	fmt.Fprint(w, string(result[:])) // nolint: errcheck

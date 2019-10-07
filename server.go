@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
-	"github.com/gorilla/mux"
 
 	"github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
 	"github.com/carbonfive/go-filecoin-rest-api/types"
@@ -22,7 +21,7 @@ const DefaultPort = ":8080"
 type V1Callbacks struct {
 	GetActorByID func(string) (*types.Actor, error)
 	GetActors    func() ([]byte, error)
-	GetBlockByID func(string) ([]byte, error)
+	GetBlockByID func(string) (*types.Block, error)
 	GetNode      func() ([]byte, error)
 }
 
@@ -39,9 +38,6 @@ type HTTPAPI struct {
 // and desired port. If port <= 0, port 8080 will be used.
 func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
 	chimux := chi.NewRouter()
-
-	gmux := mux.NewRouter()
-	gmux.PathPrefix("/api/filecoin/v1")
 
 	lport := DefaultPort
 	if port > 0 {
@@ -78,16 +74,19 @@ func (s *HTTPAPI) Run() {
 
 // Route sets up all the routes for the API
 func (s *HTTPAPI) Route() {
-	hdls := *s.v1h
+	handlers := *s.v1h
 
 	s.chimux.Route("/api/filecoin/v1", func(r chi.Router) {
 		// TODO make this a documented connection check
 		r.Handle("/hello", s.hello)
 
-		r.Get("/control/node", hdls["GetNode"].ServeHTTP)
+		r.Get("/control/node", handlers["GetNode"].ServeHTTP)
+		r.Route("/chain", func(r chi.Router) {
+			r.Get("/blocks/{blockId}", handlers["GetBlockByID"].ServeHTTP)
+		})
 		r.Route("/actors", func(r chi.Router) {
-			r.Get("/", hdls["GetActors"].ServeHTTP)
-			r.Get("/{actorId}", hdls["GetActorByID"].ServeHTTP)
+			r.Get("/", handlers["GetActors"].ServeHTTP)
+			r.Get("/{actorId}", handlers["GetActorByID"].ServeHTTP)
 		})
 	})
 }
@@ -119,6 +118,8 @@ func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {
 			handlers[fieldName] = &v1.DefaultHandler{}
 		} else {
 			switch fieldName {
+			case "GetBlockByID":
+				handlers[fieldName] = &v1.BlockHandler{Callback: cb.GetBlockByID}
 			case "GetActors":
 				handlers[fieldName] = &v1.ActorsHandler{Callback: cb.GetActors}
 			case "GetActorByID":

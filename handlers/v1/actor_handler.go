@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi"
 
 	"github.com/carbonfive/go-filecoin-rest-api/types"
-	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
 )
 
 // ActorHandler is a handler for the actors/{actorId} endpoint
@@ -18,14 +17,15 @@ type ActorHandler struct {
 
 // ServeHTTP handles an HTTP request.
 func (a *ActorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+	actorId := chi.URLParam(r, "actorId")
 	var marshaled []byte
 
-	result, err := a.Callback(vars["actorId"])
+	actor, err := a.Callback(actorId)
 	if err != nil {
-		marshaled = api_errors.MarshalErrors([]string{err.Error()})
+		marshaled = types.MarshalErrors([]string{err.Error()})
 	} else {
-		marshaled, _ = json.Marshal(result)
+		actor.Kind = "actor"
+		marshaled, _ = json.Marshal(actor)
 	}
 
 	w.WriteHeader(http.StatusOK)

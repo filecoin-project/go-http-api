@@ -13,12 +13,13 @@ type readableFunctionSignature struct {
 
 // Actor is a struct for a Filecoin actor
 type Actor struct {
-	ActorType string                               `json:"actorType"`
-	Address   string                               `json:"address"`
+	Kind      string                               `json:"kind,required,omitempty"`
+	ActorType string                               `json:"actorType,omitempty"`
+	Address   string                               `json:"address,omitempty"`
 	Code      cid.Cid                              `json:"code,omitempty"`
-	Nonce     uint64                               `json:"nonce"`
-	Balance   big.Int                              `json:"balance"`
-	Exports   map[string]readableFunctionSignature `json:"exports"` // exports by function name
+	Nonce     uint64                               `json:"nonce,omitempty"`
+	Balance   big.Int                              `json:"balance,omitempty"`
+	Exports   map[string]readableFunctionSignature `json:"exports,omitempty"` // exports by function name
 	Head      cid.Cid                              `json:"head,omitempty"`
 }
 

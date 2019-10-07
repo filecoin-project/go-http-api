@@ -14,7 +14,6 @@ import (
 	server "github.com/carbonfive/go-filecoin-rest-api"
 	"github.com/carbonfive/go-filecoin-rest-api/test"
 	"github.com/carbonfive/go-filecoin-rest-api/types"
-	"github.com/carbonfive/go-filecoin-rest-api/types/api_errors"
 )
 
 func TestActor_ServeHTTP(t *testing.T) {
@@ -39,6 +38,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 		body := test.RequireGetResponseBody(t, port, "actors/1111")
 		var actual types.Actor
 		require.NoError(t, json.Unmarshal(body, &actual))
+		assert.Equal(t, "actor", actual.Kind)
 		assert.Equal(t, fa.ActorType, actual.ActorType)
 		assert.Equal(t, fa.Address, actual.Address)
 		assert.Equal(t, fa.Balance, actual.Balance)
@@ -47,7 +47,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("Errors are put into errors array", func(t *testing.T) {
-		errs := api_errors.MarshalErrors([]string{"this is an error"})
+		errs := types.MarshalErrors([]string{"this is an error"})
 
 		fmt.Println(string(errs[:]))
 
