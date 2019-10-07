@@ -2,11 +2,10 @@ package server_test
 
 import (
 	"context"
-	"github.com/carbonfive/go-filecoin-rest-api/types"
-	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/stretchr/testify/assert"
 
 	server "github.com/carbonfive/go-filecoin-rest-api"
 	"github.com/carbonfive/go-filecoin-rest-api/test"
@@ -22,7 +21,7 @@ import (
 
 func TestNewHTTPServer(t *testing.T) {
 	t.Run("if port is <=0 the default of :8080 will be used.", func(t *testing.T) {
-		s := server.NewHTTPAPI(context.Background(), &server.V1Callbacks{}, 0).Run()
+		s := server.NewHTTPAPI(context.Background(), &server.V1Callbacks{}, server.Config{}).Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()
@@ -32,46 +31,50 @@ func TestNewHTTPServer(t *testing.T) {
 }
 
 func TestHTTPServer_Run(t *testing.T) {
+	apiConfig := func() server.Config {
+		return server.Config{
+			Port: test.RequireGetFreePort(t),
+		}
+	}
+
 	t.Run("basic hello returns good response", func(t *testing.T) {
-		port, err := test.GetFreePort()
-		require.NoError(t, err)
+		config := apiConfig()
 		s := server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{},
-			port).
+			config).
 			Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()
 
-		test.AssertResponseBody(t, port, "hello", "/api/filecoin/v1/hello, world!")
+		test.AssertResponseBody(t, config.Port, "hello", "/api/filecoin/v1/hello, world!")
 	})
 
 	t.Run("calls correct handler if a callback for it was provided", func(t *testing.T) {
-		port := test.RequireGetFreePort(t)
+		config := apiConfig()
 
-		exp := "{\"node\":\"node\",\"protocol\":{},\"bitswapStats\":{}}"
-
+		exp := `{"node":"node","protocol":{},"bitswapStats":{}}`
 		nidcb := func() (*types.Node, error) {
 			return &types.Node{}, nil
 		}
 
 		s := server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{GetNode: nidcb},
-			port).
+			config).
 			Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()
 
-		test.AssertResponseBody(t, port, "control/node", exp)
+		test.AssertResponseBody(t, config.Port, "control/node", exp)
 	})
 
 	t.Run("returns 404 when a path does not match", func(t *testing.T) {
-		port := test.RequireGetFreePort(t)
+		config := apiConfig()
 
 		s := server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{},
-			port).
+			config).
 			Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
@@ -79,6 +82,6 @@ func TestHTTPServer_Run(t *testing.T) {
 
 		path := "doesn't matter"
 
-		test.AssertResponseBody(t, port, path, "404 page not found\n")
+		test.AssertResponseBody(t, config.Port, path, "404 page not found\n")
 	})
 }

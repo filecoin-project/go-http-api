@@ -3,14 +3,15 @@ package server
 import (
 	"context"
 	"fmt"
-	logging "github.com/ipfs/go-log"
 	"net/http"
 	"reflect"
 	"time"
 
+	logging "github.com/ipfs/go-log"
+
 	"github.com/go-chi/chi"
 
-	"github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
+	v1 "github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
 	"github.com/carbonfive/go-filecoin-rest-api/types"
 )
 
@@ -39,16 +40,24 @@ type HTTPAPI struct {
 	chimux *chi.Mux                 // Muxer
 	hello  http.Handler             // hello handler
 	v1h    *map[string]http.Handler // v1 handlers
+	config Config                   // API configuration
+}
+
+// Config is implementation-specific configuration for the API
+type Config struct {
+	Port        int
+	TLSCertPath string
+	TLSKeyPath  string
 }
 
 // NewHTTPAPI creates and returns a *HTTPAPI using the provided context, *V1Callbacks,
 // and desired port. If port <= 0, port 8080 will be used.
-func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
+func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, config Config) *HTTPAPI {
 	chimux := chi.NewRouter()
 
 	lport := DefaultPort
-	if port > 0 {
-		lport = fmt.Sprintf(":%d", port)
+	if config.Port > 0 {
+		lport = fmt.Sprintf(":%d", config.Port)
 	}
 
 	s := &http.Server{
@@ -64,6 +73,7 @@ func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
 		chimux: chimux,
 		hello:  &v1.HelloHandler{},
 		v1h:    SetupV1Handlers(cb1),
+		config: config,
 	}
 }
 
@@ -73,8 +83,14 @@ func (s *HTTPAPI) Run() *HTTPAPI {
 	s.Route()
 
 	go func() {
-		if err := s.srv.ListenAndServe(); err != nil {
-			log.Error(err)
+		if s.config.TLSCertPath != "" && s.config.TLSKeyPath != "" {
+			if err := s.srv.ListenAndServeTLS(s.config.TLSCertPath, s.config.TLSKeyPath); err != nil {
+				log.Error(err)
+			}
+		} else {
+			if err := s.srv.ListenAndServe(); err != nil {
+				log.Error(err)
+			}
 		}
 	}()
 	return s
