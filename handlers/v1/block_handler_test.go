@@ -43,10 +43,13 @@ func TestBlockHeaderHandler_ServeHTTP(t *testing.T) {
 		}}
 
 		port := test.RequireGetFreePort(t)
-		server.NewHTTPAPI(context.Background(),
+		s := server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{GetBlockByID: bhh.Callback},
 			port).
 			Run()
+		defer func() {
+			assert.NoError(t, s.Shutdown())
+		}()
 
 		body := test.RequireGetResponseBody(t, port, "chain/blocks/1111")
 		var actual types.Block

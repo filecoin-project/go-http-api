@@ -7,7 +7,7 @@ import (
 	"math/big"
 	"testing"
 
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	server "github.com/carbonfive/go-filecoin-rest-api"
@@ -29,10 +29,13 @@ func TestActor_ServeHTTP(t *testing.T) {
 		}
 
 		port := test.RequireGetFreePort(t)
-		server.NewHTTPAPI(context.Background(),
+		s := server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{GetActorByID: acb},
 			port).
 			Run()
+		defer func() {
+			assert.NoError(t, s.Shutdown())
+		}()
 
 		body := test.RequireGetResponseBody(t, port, "actors/1111")
 		var actual types.Actor
@@ -53,10 +56,13 @@ func TestActor_ServeHTTP(t *testing.T) {
 		}
 
 		port := test.RequireGetFreePort(t)
-		server.NewHTTPAPI(context.Background(),
+		s := server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{GetActorByID: acb},
 			port).
 			Run()
+		defer func() {
+			assert.NoError(t, s.Shutdown())
+		}()
 
 		test.AssertResponseBody(t, port, "actors/1111", string(errs[:]))
 

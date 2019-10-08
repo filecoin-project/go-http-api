@@ -62,7 +62,7 @@ func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, port int) *HTTPAPI {
 
 // Run sets up the route handlers using the provided callbacks, and starts
 // the HTTP API server.
-func (s *HTTPAPI) Run() {
+func (s *HTTPAPI) Run() *HTTPAPI {
 	s.Route()
 
 	go func() {
@@ -70,6 +70,7 @@ func (s *HTTPAPI) Run() {
 			log.Println(err)
 		}
 	}()
+	return s
 }
 
 // Route sets up all the routes for the API
