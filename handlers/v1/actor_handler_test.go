@@ -27,8 +27,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 			return &fa, nil
 		}
 
-		s := test.CreateTestServer(t, &server.V1Callbacks{GetActorByID: acb}, false)
-		s.Run()
+		s := test.CreateTestServer(t, &server.V1Callbacks{GetActorByID: acb}, false).Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()

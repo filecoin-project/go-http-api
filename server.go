@@ -29,8 +29,8 @@ type V1Callbacks struct {
 	GetActorByID   func(string) (*types.Actor, error)
 	GetActors      func() ([]*types.Actor, error)
 	GetBlockByID   func(string) (*types.Block, error)
+	GetMessageByID func(string) (*types.Message, error)
 	GetNode        func() (*types.Node, error)
-	GetMessageByID func() (*types.Message, error)
 }
 
 // HTTPAPI is a struct containing all the things needed to serve the Filecoin HTTP API
@@ -154,6 +154,8 @@ func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {
 				handlers[fieldName] = &v1.ActorsHandler{Callback: cb.GetActors}
 			case "GetActorByID":
 				handlers[fieldName] = &v1.ActorHandler{Callback: cb.GetActorByID}
+			case "GetMessageByID":
+				handlers[fieldName] = &v1.MessageHandler{Callback: cb.GetMessageByID}
 			case "GetNode":
 				handlers[fieldName] = &v1.NodeHandler{Callback: cb.GetNode}
 			default:
