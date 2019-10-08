@@ -15,17 +15,22 @@ type MessageHandler struct {
 }
 
 func (mh *MessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	msgId := chi.URLParam(r, "messageId")
 	var marshaled []byte
+	msgId := chi.URLParam(r, "messageId")
 
 	msg, err := mh.Callback(msgId)
 	if err != nil {
 		marshaled = types.MarshalErrors([]string{err.Error()})
 	} else {
 		msg.Kind = "message"
-		marshaled, _ = json.Marshal(msg)
+		if marshaled, err = json.Marshal(msg) ; err != nil {
+			log.Error(err)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, string(marshaled[:])) // nolint: errcheck
+	if _,err = fmt.Fprint(w, string(marshaled[:])); err != nil {
+		log.Error(err)
+	}
 }

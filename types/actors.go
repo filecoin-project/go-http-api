@@ -22,7 +22,3 @@ type Actor struct {
 	Exports   map[string]readableFunctionSignature `json:"exports,omitempty"` // exports by function name
 	Head      cid.Cid                              `json:"head,omitempty"`
 }
-
-type Actors struct {
-	List []*Actor `json:"actors"`
-}

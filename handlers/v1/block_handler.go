@@ -26,8 +26,13 @@ func (bhh *BlockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		block.Kind = "block"
 		block.Header.Kind = "blockHeader"
-		marshaled, _ = json.Marshal(block)
+		if marshaled, err = json.Marshal(block); err != nil {
+			log.Error(err)
+			return
+		}
 	}
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, string(marshaled[:])) // nolint: errcheck
+	if _,err = fmt.Fprint(w, string(marshaled[:])); err != nil {
+		log.Error(err)
+	}
 }

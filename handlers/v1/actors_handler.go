@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -9,17 +10,28 @@ import (
 
 // ActorsHandler is the handler for the actors endpoint
 type ActorsHandler struct {
-	Callback func() (json []byte, err error)
+	Callback func() ([]*types.Actor, error)
 }
 
 // ServeHTTP handles an HTTP request.
 func (a *ActorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var marshaled []byte
 	result, err := a.Callback()
 
-	w.WriteHeader(http.StatusOK)
 	if err != nil {
-		result = types.MarshalErrors([]string{err.Error()})
+		marshaled = types.MarshalErrors([]string{err.Error()})
+	} else {
+		for _,el := range result {
+			el.Kind = "actor"
+		}
+		if marshaled, err = json.Marshal(result); err != nil {
+			log.Error(err)
+			return
+		}
 	}
 
-	fmt.Fprint(w, string(result[:])) // nolint: errcheck
+	w.WriteHeader(http.StatusOK)
+	if _,err = fmt.Fprint(w, string(marshaled[:])); err != nil {
+		log.Error(err)
+	}
 }

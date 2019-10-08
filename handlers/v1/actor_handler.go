@@ -25,9 +25,14 @@ func (a *ActorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		marshaled = types.MarshalErrors([]string{err.Error()})
 	} else {
 		actor.Kind = "actor"
-		marshaled, _ = json.Marshal(actor)
+		if marshaled, err = json.Marshal(actor); err != nil {
+			log.Error(err)
+			return
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, string(marshaled[:])) // nolint: errcheck
+	if _,err = fmt.Fprint(w, string(marshaled[:])); err != nil {
+		log.Error(err)
+	}
 }

@@ -16,7 +16,9 @@ type HelloHandler struct {
 // ServeHTTP handles an HTTP request.
 func (hh *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if _, err := fmt.Fprintf(w, "%s, world!", html.EscapeString(r.RequestURI)); err != nil {
-		fmt.Fprint(w, types.MarshalErrors([]string{err.Error()})) // nolint: errcheck
 		log.Error(err)
+		if _,err = fmt.Fprint(w, types.MarshalErrors([]string{err.Error()})) ; err != nil {
+			log.Error(err)
+		}
 	}
 }

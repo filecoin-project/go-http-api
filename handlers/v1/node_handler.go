@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -9,15 +10,25 @@ import (
 
 // NodeHandler is the handler for the control/node endpoint
 type NodeHandler struct {
-	Callback func() (json []byte, err error)
+	Callback func() (*types.Node, error)
 }
 
 func (nid *NodeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	result, err := nid.Callback()
+	var marshaled []byte
+	node, err := nid.Callback()
 
 	if err != nil {
-		result = types.MarshalErrors([]string{err.Error()})
+		marshaled = types.MarshalErrors([]string{err.Error()})
+	} else {
+		node.Kind= "node"
+		if marshaled, err = json.Marshal(node); err != nil {
+			log.Error(err)
+			return
+		}
 	}
+
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, string(result[:])) // nolint: errcheck
+	if _,err = fmt.Fprint(w, string(marshaled[:])); err != nil {
+		log.Error(err)
+	}
 }

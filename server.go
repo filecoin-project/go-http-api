@@ -20,9 +20,9 @@ const DefaultPort = ":8080"
 // shown by the 'path' tag
 type V1Callbacks struct {
 	GetActorByID func(string) (*types.Actor, error)
-	GetActors    func() ([]byte, error)
+	GetActors    func() ([]*types.Actor, error)
 	GetBlockByID func(string) (*types.Block, error)
-	GetNode      func() ([]byte, error)
+	GetNode      func() (*types.Node, error)
 }
 
 // HTTPAPI is a struct containing all the things needed to serve the Filecoin HTTP API

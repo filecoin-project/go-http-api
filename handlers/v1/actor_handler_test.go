@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"math/big"
 	"testing"
 
@@ -48,8 +47,6 @@ func TestActor_ServeHTTP(t *testing.T) {
 
 	t.Run("Errors are put into errors array", func(t *testing.T) {
 		errs := types.MarshalErrors([]string{"this is an error"})
-
-		fmt.Println(string(errs[:]))
 
 		acb := func(actorId string) (*types.Actor, error) {
 			return nil, errors.New("this is an error")
