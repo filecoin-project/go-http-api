@@ -1,7 +1,6 @@
 package v1_test
 
 import (
-	"context"
 	"encoding/json"
 	"math/big"
 	"testing"
@@ -42,16 +41,14 @@ func TestBlockHeaderHandler_ServeHTTP(t *testing.T) {
 			return &tb, nil
 		}}
 
-		port := test.RequireGetFreePort(t)
-		s := server.NewHTTPAPI(context.Background(),
-			&server.V1Callbacks{GetBlockByID: bhh.Callback},
-			port).
-			Run()
+		cbs := &server.V1Callbacks{GetBlockByID: bhh.Callback}
+		s := test.CreateTestServer(t, cbs, false)
+		s.Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()
 
-		body := test.RequireGetResponseBody(t, port, "chain/blocks/1111")
+		body := test.RequireGetResponseBody(t, s.Config().Port, "chain/blocks/1111")
 		var actual types.Block
 		require.NoError(t, json.Unmarshal(body, &actual))
 		assert.True(t, actual.ID.Equals(tb.ID))

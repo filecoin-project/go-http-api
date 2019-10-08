@@ -126,6 +126,11 @@ func (s *HTTPAPI) Router() chi.Router {
 	return s.chimux
 }
 
+// Config returns a copy of the config
+func (s *HTTPAPI) Config() Config {
+	return s.config
+}
+
 // SetupV1Handlers takes a V1Callback struct and iterates over all
 // functions, creating a handler with a callback for each supported endpoint.
 func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {

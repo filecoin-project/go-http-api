@@ -1,7 +1,6 @@
 package v1_test
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"math/big"
@@ -28,16 +27,13 @@ func TestActor_ServeHTTP(t *testing.T) {
 			return &fa, nil
 		}
 
-		port := test.RequireGetFreePort(t)
-		s := server.NewHTTPAPI(context.Background(),
-			&server.V1Callbacks{GetActorByID: acb},
-			port).
-			Run()
+		s := test.CreateTestServer(t, &server.V1Callbacks{GetActorByID: acb}, false)
+		s.Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()
 
-		body := test.RequireGetResponseBody(t, port, "actors/1111")
+		body := test.RequireGetResponseBody(t, s.Config().Port, "actors/1111")
 		var actual types.Actor
 		require.NoError(t, json.Unmarshal(body, &actual))
 		assert.Equal(t, "actor", actual.Kind)
@@ -55,17 +51,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 			return nil, errors.New("this is an error")
 		}
 
-		port := test.RequireGetFreePort(t)
-		s := server.NewHTTPAPI(context.Background(),
-			&server.V1Callbacks{GetActorByID: acb},
-			port).
-			Run()
-		defer func() {
-			assert.NoError(t, s.Shutdown())
-		}()
-
-		test.AssertResponseBody(t, port, "actors/1111", string(errs[:]))
-
+		cbs := &server.V1Callbacks{GetActorByID: acb}
+		test.AssertServerResponse(t, cbs, false, "actors/1111", string(errs[:]))
 	})
-
 }
