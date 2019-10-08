@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
-	"log"
+	logging "github.com/ipfs/go-log"
 	"net/http"
 	"reflect"
 	"time"
@@ -16,13 +16,20 @@ import (
 
 const DefaultPort = ":8080"
 
+var log = logging.Logger("rest-api-server")
+
 // V1Callbacks is a struct for callbacks configurable for the given API endpoint,
 // shown by the 'path' tag
+// To add a new endpoint:
+//   * Write a new handler to use a new V1Callback, with tests
+//   * Add a new callback name/signature to V1Callbacks
+//   * Add a case to SetupV1Handlers that uses the callback
 type V1Callbacks struct {
-	GetActorByID func(string) (*types.Actor, error)
-	GetActors    func() ([]*types.Actor, error)
-	GetBlockByID func(string) (*types.Block, error)
-	GetNode      func() (*types.Node, error)
+	GetActorByID   func(string) (*types.Actor, error)
+	GetActors      func() ([]*types.Actor, error)
+	GetBlockByID   func(string) (*types.Block, error)
+	GetNode        func() (*types.Node, error)
+	GetMessageByID func() (*types.Message, error)
 }
 
 // HTTPAPI is a struct containing all the things needed to serve the Filecoin HTTP API
@@ -67,7 +74,7 @@ func (s *HTTPAPI) Run() *HTTPAPI {
 
 	go func() {
 		if err := s.srv.ListenAndServe(); err != nil {
-			log.Println(err)
+			log.Error(err)
 		}
 	}()
 	return s
@@ -84,6 +91,7 @@ func (s *HTTPAPI) Route() {
 		r.Get("/control/node", handlers["GetNode"].ServeHTTP)
 		r.Route("/chain", func(r chi.Router) {
 			r.Get("/blocks/{blockId}", handlers["GetBlockByID"].ServeHTTP)
+			r.Get("/executed-messages/{executedMessageId}", handlers["GetMessageByID"].ServeHTTP)
 		})
 		r.Route("/actors", func(r chi.Router) {
 			r.Get("/", handlers["GetActors"].ServeHTTP)
@@ -128,9 +136,8 @@ func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {
 			case "GetNode":
 				handlers[fieldName] = &v1.NodeHandler{Callback: cb.GetNode}
 			default:
-				handlers[fieldName] = &v1.DefaultHandler{}
+				log.Errorf("skipping unknown handler: %s.", fieldName)
 			}
-
 		}
 	}
 	return &handlers

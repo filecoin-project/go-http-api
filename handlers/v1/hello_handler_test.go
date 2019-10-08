@@ -5,12 +5,14 @@ import (
 	server "github.com/carbonfive/go-filecoin-rest-api"
 	"github.com/carbonfive/go-filecoin-rest-api/test"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"testing"
 )
 
-func TestDefaultHandler_ServeHTTP(t *testing.T) {
-	t.Run("calls default handler if no callback was provided", func(t *testing.T) {
-		port := test.RequireGetFreePort(t)
+func TestHelloHandler_ServeHTTP(t *testing.T) {
+	t.Run("basic hello returns good response", func(t *testing.T) {
+		port, err := test.GetFreePort()
+		require.NoError(t, err)
 		s := server.NewHTTPAPI(context.Background(),
 			&server.V1Callbacks{},
 			port).
@@ -19,6 +21,6 @@ func TestDefaultHandler_ServeHTTP(t *testing.T) {
 			assert.NoError(t, s.Shutdown())
 		}()
 
-		test.AssertResponseBody(t, port, "control/node", "/api/filecoin/v1/control/node is not implemented")
+		test.AssertResponseBody(t, port, "hello", "/api/filecoin/v1/hello, world!")
 	})
 }
