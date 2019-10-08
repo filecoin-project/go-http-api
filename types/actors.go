@@ -1,6 +1,7 @@
 package types
 
 import (
+	"encoding/json"
 	"math/big"
 
 	"github.com/ipfs/go-cid"
@@ -18,7 +19,14 @@ type Actor struct {
 	Address   string                               `json:"address,omitempty"`
 	Code      cid.Cid                              `json:"code,omitempty"`
 	Nonce     uint64                               `json:"nonce,omitempty"`
-	Balance   big.Int                              `json:"balance,omitempty"`
+	Balance   *big.Int                             `json:"balance,omitempty"`
 	Exports   map[string]readableFunctionSignature `json:"exports,omitempty"` // exports by function name
 	Head      cid.Cid                              `json:"head,omitempty"`
+}
+
+func (o Actor) MarshalJSON() ([]byte, error) {
+	type alias Actor
+	out := alias(o)
+	out.Kind = "actor"
+	return json.Marshal(out)
 }

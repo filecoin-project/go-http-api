@@ -19,7 +19,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 		fa := types.Actor{
 			ActorType: "account",
 			Address:   "abcd123",
-			Balance:   *big.NewInt(600),
+			Balance:   big.NewInt(600),
 			Code:      test.RequireTestCID(t, []byte("anything")),
 			Nonce:     123434,
 		}

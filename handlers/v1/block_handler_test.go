@@ -23,7 +23,7 @@ func TestBlockHeaderHandler_ServeHTTP(t *testing.T) {
 			Tickets:               [][]byte{[]byte("ticket1")},
 			ElectionProof:         []byte("electionproof"),
 			Parents:               []cid.Cid{test.RequireTestCID(t, []byte("parent1"))},
-			ParentWeight:          *big.NewInt(1234),
+			ParentWeight:          big.NewInt(1234),
 			Height:                34343,
 			ParentStateRoot:       test.RequireTestCID(t, []byte("stateroot")),
 			ParentMessageReceipts: test.RequireTestCID(t, []byte("receipts")),
@@ -52,20 +52,20 @@ func TestBlockHeaderHandler_ServeHTTP(t *testing.T) {
 		var actual types.Block
 		require.NoError(t, json.Unmarshal(body, &actual))
 		assert.True(t, actual.ID.Equals(tb.ID))
-		assert.Equal(t, "block", tb.Kind)
-		assert.Equal(t, "blockHeader", tb.Header.Kind)
-		assert.Equal(t, actual.Header.Miner, tb.Header.Miner)
-		assert.Equal(t, actual.Header.Tickets[0], tb.Header.Tickets[0])
-		assert.Equal(t, actual.Header.ElectionProof, tb.Header.ElectionProof)
+		assert.Equal(t, "block", actual.Kind)
+		assert.Equal(t, "blockHeader", actual.Header.Kind)
+		assert.Equal(t, tb.Header.Miner, actual.Header.Miner)
+		assert.Equal(t, tb.Header.Tickets[0], actual.Header.Tickets[0])
+		assert.Equal(t, tb.Header.ElectionProof, actual.Header.ElectionProof)
 		assert.True(t, tb.Header.Parents[0].Equals(actual.Header.Parents[0]))
-		assert.Equal(t, actual.Header.ParentWeight, tb.Header.ParentWeight)
-		assert.Equal(t, actual.Header.Height, tb.Header.Height)
+		assert.Equal(t, tb.Header.ParentWeight, actual.Header.ParentWeight)
+		assert.Equal(t, tb.Header.Height, actual.Header.Height)
 		assert.True(t, tb.Header.ParentStateRoot.Equals(actual.Header.ParentStateRoot))
 		assert.True(t, tb.Header.ParentMessageReceipts.Equals(actual.Header.ParentMessageReceipts))
 		assert.True(t, tb.Header.Messages.Equals(actual.Header.Messages))
-		assert.Equal(t, actual.Header.BLSAggregate, tb.Header.BLSAggregate)
-		assert.Equal(t, actual.Header.Timestamp, tb.Header.Timestamp)
-		assert.Equal(t, actual.Header.BlockSig, tb.Header.BlockSig)
+		assert.Equal(t, tb.Header.BLSAggregate, actual.Header.BLSAggregate)
+		assert.Equal(t, tb.Header.Timestamp, actual.Header.Timestamp)
+		assert.Equal(t, tb.Header.BlockSig, actual.Header.BlockSig)
 	})
 
 }
