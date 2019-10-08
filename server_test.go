@@ -46,23 +46,11 @@ func TestHTTPServer_Run(t *testing.T) {
 		test.AssertResponseBody(t, port, "hello", "/api/filecoin/v1/hello, world!")
 	})
 
-	t.Run("calls default handler if no callback was provided", func(t *testing.T) {
-		port := test.RequireGetFreePort(t)
-		s := server.NewHTTPAPI(context.Background(),
-			&server.V1Callbacks{},
-			port).
-			Run()
-		defer func() {
-			assert.NoError(t, s.Shutdown())
-		}()
-
-		test.AssertResponseBody(t, port, "control/node", "/api/filecoin/v1/control/node is not implemented")
-	})
-
 	t.Run("calls correct handler if a callback for it was provided", func(t *testing.T) {
 		port := test.RequireGetFreePort(t)
 
-		exp := "abcd123"
+		exp := "{\"node\":\"node\",\"protocol\":{},\"bitswapStats\":{}}"
+
 		nidcb := func() (*types.Node, error) {
 			return &types.Node{}, nil
 		}
@@ -89,6 +77,8 @@ func TestHTTPServer_Run(t *testing.T) {
 			assert.NoError(t, s.Shutdown())
 		}()
 
-		test.AssertResponseBody(t, port, "foo", "404 page not found\n")
+		path := "doesn't matter"
+
+		test.AssertResponseBody(t, port, path, "404 page not found\n")
 	})
 }
