@@ -8,8 +8,8 @@ type Message struct {
 	Nonce      uint64        `json:"nonce,omitempty"`
 	From       string        `json:"from,omitempty"`
 	To         string        `json:"to,omitempty"`
-	Value      big.Int       `json:"value,omitempty"`    // in AttoFIL
-	GasPrice   big.Int       `json:"gasPrice,omitempty"` // in AttoFIL
+	Value      *big.Int      `json:"value,omitempty"`    // in AttoFIL
+	GasPrice   *big.Int      `json:"gasPrice,omitempty"` // in AttoFIL
 	GasLimit   uint64        `json:"gasLimit,omitempty"` // in GasUnits
 	Method     string        `json:"method,omitempty"`
 	Parameters []interface{} `json:"parameters,omitempty"`
