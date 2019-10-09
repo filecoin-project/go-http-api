@@ -29,6 +29,7 @@ type V1Callbacks struct {
 	GetActorByID   func(string) (*types.Actor, error)
 	GetActors      func() ([]*types.Actor, error)
 	GetBlockByID   func(string) (*types.Block, error)
+	CreateMessage func(*types.Message) (*types.Message, error)
 	GetMessageByID func(string) (*types.Message, error)
 	GetNode        func() (*types.Node, error)
 }
@@ -108,6 +109,7 @@ func (s *HTTPAPI) Route() {
 		r.Route("/chain", func(r chi.Router) {
 			r.Get("/blocks/{blockId}", handlers["GetBlockByID"].ServeHTTP)
 			r.Get("/executed-messages/{executedMessageId}", handlers["GetMessageByID"].ServeHTTP)
+			r.Post("/messages", handlers["CreateMessage"].ServeHTTP)
 		})
 		r.Route("/actors", func(r chi.Router) {
 			r.Get("/", handlers["GetActors"].ServeHTTP)
@@ -154,6 +156,8 @@ func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {
 				handlers[fieldName] = &v1.ActorsHandler{Callback: cb.GetActors}
 			case "GetActorByID":
 				handlers[fieldName] = &v1.ActorHandler{Callback: cb.GetActorByID}
+			case "CreateMessage":
+				handlers[fieldName] = &v1.CreateMessageHandler{Callback: cb.CreateMessage }
 			case "GetMessageByID":
 				handlers[fieldName] = &v1.MessageHandler{Callback: cb.GetMessageByID}
 			case "GetNode":
