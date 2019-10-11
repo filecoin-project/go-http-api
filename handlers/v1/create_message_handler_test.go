@@ -55,15 +55,8 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 	body := test.RequirePostFormResponseBody(t, s.Config().Port, path, postParams)
 
 	var executedMsg types.Message
+	expectedMsg.Kind = "message"
 
 	require.NoError(t, json.Unmarshal(body, &executedMsg))
-	assert.Equal(t, "message", executedMsg.Kind)
-	assert.Equal(t, expectedMsg.Value, executedMsg.Value)
-	assert.Equal(t, expectedMsg.ID, executedMsg.ID)
-	assert.Equal(t, expectedMsg.Nonce, executedMsg.Nonce)
-	assert.Equal(t, expectedMsg.GasPrice, executedMsg.GasPrice)
-	assert.Equal(t, expectedMsg.GasLimit, executedMsg.GasLimit)
-	assert.Equal(t, expectedMsg.Method, executedMsg.Method)
-	assert.Equal(t, expectedMsg.Parameters, executedMsg.Parameters)
-	assert.Equal(t, expectedMsg.Signature, executedMsg.Signature)
+	assert.Equal(t, expectedMsg, executedMsg)
 }

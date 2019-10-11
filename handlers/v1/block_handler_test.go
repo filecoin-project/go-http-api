@@ -51,21 +51,9 @@ func TestBlockHeaderHandler_ServeHTTP(t *testing.T) {
 		body := test.RequireGetResponseBody(t, s.Config().Port, "chain/blocks/1111")
 		var actual types.Block
 		require.NoError(t, json.Unmarshal(body, &actual))
-		assert.True(t, actual.ID.Equals(tb.ID))
-		assert.Equal(t, "block", actual.Kind)
-		assert.Equal(t, "blockHeader", actual.Header.Kind)
-		assert.Equal(t, tb.Header.Miner, actual.Header.Miner)
-		assert.Equal(t, tb.Header.Tickets[0], actual.Header.Tickets[0])
-		assert.Equal(t, tb.Header.ElectionProof, actual.Header.ElectionProof)
-		assert.True(t, tb.Header.Parents[0].Equals(actual.Header.Parents[0]))
-		assert.Equal(t, tb.Header.ParentWeight, actual.Header.ParentWeight)
-		assert.Equal(t, tb.Header.Height, actual.Header.Height)
-		assert.True(t, tb.Header.ParentStateRoot.Equals(actual.Header.ParentStateRoot))
-		assert.True(t, tb.Header.ParentMessageReceipts.Equals(actual.Header.ParentMessageReceipts))
-		assert.True(t, tb.Header.Messages.Equals(actual.Header.Messages))
-		assert.Equal(t, tb.Header.BLSAggregate, actual.Header.BLSAggregate)
-		assert.Equal(t, tb.Header.Timestamp, actual.Header.Timestamp)
-		assert.Equal(t, tb.Header.BlockSig, actual.Header.BlockSig)
+		tb.Header.Kind = "blockHeader"
+		tb.Kind = "block"
+		assert.Equal(t, tb, actual)
 	})
 
 }

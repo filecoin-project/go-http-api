@@ -33,14 +33,10 @@ func TestActor_ServeHTTP(t *testing.T) {
 		}()
 
 		body := test.RequireGetResponseBody(t, s.Config().Port, "actors/1111")
+		fa.Kind = "actor"
 		var actual types.Actor
 		require.NoError(t, json.Unmarshal(body, &actual))
-		assert.Equal(t, "actor", actual.Kind)
-		assert.Equal(t, fa.ActorType, actual.ActorType)
-		assert.Equal(t, fa.Address, actual.Address)
-		assert.Equal(t, fa.Balance, actual.Balance)
-		assert.Equal(t, fa.Code, actual.Code)
-		assert.Equal(t, fa.Nonce, actual.Nonce)
+		assert.Equal(t, fa, actual)
 	})
 
 	t.Run("Errors are put into errors array", func(t *testing.T) {

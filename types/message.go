@@ -5,6 +5,8 @@ import (
 	"errors"
 	"math/big"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 type Message struct {
@@ -28,13 +30,24 @@ func (m Message) MarshalJSON() ([]byte, error) {
 	return json.Marshal(out)
 }
 
-type MessageRequest struct {
-	*Message
-}
+func (m *Message) BindRequest(r *http.Request) error {
+	var err error
 
-func (mr *MessageRequest) Bind(r *http.Request) error {
-	if mr.Message == nil {
-		return errors.New("message fields missing")
+	m.To = r.FormValue("to")
+	vstr := r.FormValue("value")
+	var ok bool
+	m.Value, ok = big.NewInt(0).SetString(vstr, 10)
+	if !ok {
+		return errors.New("failed to parse big.Int: Value")
 	}
+	m.GasPrice, ok = big.NewInt(0).SetString(r.FormValue("gasPrice"), 10)
+	if !ok {
+		return errors.New("failed to parse big.Int: GasPrice")
+	}
+	if m.GasLimit, err = strconv.ParseUint(r.FormValue("gasLimit"), 10, 64); err != nil {
+		return err
+	}
+	m.Method = r.FormValue("method")
+	m.Parameters = strings.Split(r.FormValue("parameters"), ",")
 	return nil
 }
