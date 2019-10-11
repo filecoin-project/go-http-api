@@ -18,7 +18,7 @@ func TestNewHTTPServer(t *testing.T) {
 			assert.NoError(t, s.Shutdown())
 		}()
 
-		test.AssertResponseBody(t, 8080, false, "hello", "/api/filecoin/v1/hello, world!")
+		test.AssertGetResponseBody(t, 8080, false, "hello", "/api/filecoin/v1/hello, world!")
 	})
 }
 

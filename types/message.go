@@ -2,7 +2,9 @@ package types
 
 import (
 	"encoding/json"
+	"errors"
 	"math/big"
+	"net/http"
 )
 
 type Message struct {
@@ -19,9 +21,20 @@ type Message struct {
 	Signature  string   `json:"signature,omitempty"`
 }
 
-func (m Message) MarshalJSON()([]byte, error) {
+func (m Message) MarshalJSON() ([]byte, error) {
 	type alias Message
 	out := alias(m)
 	out.Kind = "message"
 	return json.Marshal(out)
+}
+
+type MessageRequest struct {
+	*Message
+}
+
+func (mr *MessageRequest) Bind(r *http.Request) error {
+	if mr.Message == nil {
+		return errors.New("message fields missing")
+	}
+	return nil
 }

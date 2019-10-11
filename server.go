@@ -29,7 +29,7 @@ type V1Callbacks struct {
 	GetActorByID   func(string) (*types.Actor, error)
 	GetActors      func() ([]*types.Actor, error)
 	GetBlockByID   func(string) (*types.Block, error)
-	CreateMessage func(*types.Message) (*types.Message, error)
+	CreateMessage  func(*types.Message) (*types.Message, error)
 	GetMessageByID func(string) (*types.Message, error)
 	GetNode        func() (*types.Node, error)
 }
@@ -157,7 +157,7 @@ func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {
 			case "GetActorByID":
 				handlers[fieldName] = &v1.ActorHandler{Callback: cb.GetActorByID}
 			case "CreateMessage":
-				handlers[fieldName] = &v1.CreateMessageHandler{Callback: cb.CreateMessage }
+				handlers[fieldName] = &v1.CreateMessageHandler{Callback: cb.CreateMessage}
 			case "GetMessageByID":
 				handlers[fieldName] = &v1.MessageHandler{Callback: cb.GetMessageByID}
 			case "GetNode":
