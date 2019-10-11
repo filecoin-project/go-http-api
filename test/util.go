@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"testing"
 
 	server "github.com/carbonfive/go-filecoin-rest-api"
@@ -44,12 +45,17 @@ func RequireGetResponseBody(t *testing.T, port int, path string) []byte {
 	return getResponseBody(t, uri)
 }
 
+func RequirePostFormResponseBody(t *testing.T, port int, path string, params url.Values) []byte {
+	uri := fmt.Sprintf("http://localhost:%d/api/filecoin/v1/%s", port, path)
+	return postFormResponseBody(t, uri, params)
+}
+
 func RequireGetResponseBodySSL(t *testing.T, port int, path string) []byte {
 	uri := fmt.Sprintf("https://localhost:%d/api/filecoin/v1/%s", port, path)
 	return getResponseBody(t, uri)
 }
 
-func AssertResponseBody(t *testing.T, port int, ssl bool, path string, exp string) {
+func AssertGetResponseBody(t *testing.T, port int, ssl bool, path string, exp string) {
 	var body []byte
 
 	if ssl {
@@ -81,6 +87,22 @@ func getResponseBody(t *testing.T, uri string) []byte {
 	return body
 }
 
+func postFormResponseBody(t *testing.T, uri string, params url.Values) []byte {
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	client := &http.Client{Transport: tr}
+
+	resp, err := client.PostForm(uri, params)
+	require.NoError(t, err)
+	require.Greater(t, 201, resp.StatusCode)
+	defer func() {
+		require.NoError(t, resp.Body.Close())
+	}()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	require.NoError(t, err)
+	return body
+}
+
 func CreateTestServer(t *testing.T, callbacks *server.V1Callbacks, ssl bool) *server.HTTPAPI {
 	cfg := server.Config{Port: RequireGetFreePort(t)}
 	if ssl {
@@ -99,5 +121,5 @@ func AssertServerResponse(t *testing.T, callbacks *server.V1Callbacks, ssl bool,
 		assert.NoError(t, s.Shutdown())
 	}()
 
-	AssertResponseBody(t, s.Config().Port, ssl, path, expected)
+	AssertGetResponseBody(t, s.Config().Port, ssl, path, expected)
 }

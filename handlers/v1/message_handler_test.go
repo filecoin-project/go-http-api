@@ -36,18 +36,10 @@ func TestMessageHandler_ServeHTTP(t *testing.T) {
 		}()
 
 		body := test.RequireGetResponseBody(t, s.Config().Port, "chain/executed-messages/someid")
+		expected.Kind = "message"
 		var actual types.Message
 		require.NoError(t, json.Unmarshal(body, &actual))
-		assert.Equal(t, "message", actual.Kind)
-		assert.Equal(t, expected.ID, actual.ID)
-		assert.Equal(t, expected.Nonce, actual.Nonce)
-		assert.Equal(t, expected.From, actual.From)
-		assert.Equal(t, expected.To, actual.To)
-		assert.Equal(t, expected.Value, actual.Value)
-		assert.Equal(t, expected.GasPrice, actual.GasPrice)
-		assert.Equal(t, expected.GasLimit, actual.GasLimit)
-		assert.Equal(t, expected.Method, actual.Method)
-		assert.Equal(t, expected.Signature, actual.Signature)
+		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("GetMessageByID passes on errors returned by Callback", func(t *testing.T) {
