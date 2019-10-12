@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/carbonfive/go-filecoin-rest-api/handlers"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -17,5 +18,5 @@ type BlockHandler struct {
 func (bhh *BlockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	blockId := chi.URLParam(r, "actorId")
 	block, err := bhh.Callback(blockId)
-	Respond(w, block, err)
+	handlers.Respond(w, block, err)
 }

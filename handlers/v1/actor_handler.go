@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"github.com/carbonfive/go-filecoin-rest-api/handlers"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -17,5 +18,5 @@ type ActorHandler struct {
 func (a *ActorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	actorId := chi.URLParam(r, "actorId")
 	actor, err := a.Callback(actorId)
-	Respond(w, actor, err)
+	handlers.Respond(w, actor, err)
 }
