@@ -11,8 +11,8 @@ import (
 
 	"github.com/go-chi/chi"
 
-	v1 "github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 const DefaultPort = ":8080"

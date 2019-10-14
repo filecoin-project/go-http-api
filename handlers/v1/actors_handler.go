@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 // ActorsHandler is the handler for the actors endpoint
@@ -21,7 +21,7 @@ func (a *ActorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		marshaled = types.MarshalErrors([]string{err.Error()})
 	} else {
-		for _,el := range result {
+		for _, el := range result {
 			el.Kind = "actor"
 		}
 		if marshaled, err = json.Marshal(result); err != nil {
@@ -31,7 +31,7 @@ func (a *ActorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	if _,err = fmt.Fprint(w, string(marshaled[:])); err != nil {
+	if _, err = fmt.Fprint(w, string(marshaled[:])); err != nil {
 		log.Error(err)
 	}
 }

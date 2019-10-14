@@ -5,7 +5,7 @@ import (
 	"html"
 	"net/http"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 // HelloHandler is a handler for the hello endpoint.
@@ -17,7 +17,7 @@ type HelloHandler struct {
 func (hh *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if _, err := fmt.Fprintf(w, "%s, world!", html.EscapeString(r.RequestURI)); err != nil {
 		log.Error(err)
-		if _,err = fmt.Fprint(w, types.MarshalErrors([]string{err.Error()})) ; err != nil {
+		if _, err = fmt.Fprint(w, types.MarshalErrors([]string{err.Error()})); err != nil {
 			log.Error(err)
 		}
 	}

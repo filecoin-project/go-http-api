@@ -5,7 +5,8 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/handlers"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 // ActorHandler is a handler for the actors/{actorId} endpoint
@@ -17,5 +18,5 @@ type ActorHandler struct {
 func (a *ActorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	actorId := chi.URLParam(r, "actorId")
 	actor, err := a.Callback(actorId)
-	Respond(w, actor, err)
+	handlers.Respond(w, actor, err)
 }

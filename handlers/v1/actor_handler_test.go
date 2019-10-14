@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	server "github.com/carbonfive/go-filecoin-rest-api"
-	"github.com/carbonfive/go-filecoin-rest-api/test"
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	server "github.com/filecoin-project/go-http-api"
+	"github.com/filecoin-project/go-http-api/test"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 func TestActor_ServeHTTP(t *testing.T) {

@@ -5,7 +5,8 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/handlers"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 // BlockHandler is a handler for the blockheader endpoint
@@ -17,5 +18,5 @@ type BlockHandler struct {
 func (bhh *BlockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	blockId := chi.URLParam(r, "actorId")
 	block, err := bhh.Callback(blockId)
-	Respond(w, block, err)
+	handlers.Respond(w, block, err)
 }

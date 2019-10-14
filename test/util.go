@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"testing"
 
-	server "github.com/carbonfive/go-filecoin-rest-api"
+	server "github.com/filecoin-project/go-http-api"
 
 	"github.com/ipfs/go-cid"
 	"github.com/multiformats/go-multihash"
