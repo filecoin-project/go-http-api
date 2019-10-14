@@ -27,7 +27,7 @@ func TestRespond(t *testing.T) {
 		rw := httptest.NewRecorder()
 		handlers.Respond(rw, nil, errors.New("boom"))
 
-		assert.Equal(t, http.StatusOK, rw.Code)
+		assert.Equal(t, http.StatusBadRequest, rw.Code)
 		assert.Equal(t, `{"errors":["boom"]}`, rw.Body.String())
 	})
 }
