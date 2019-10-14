@@ -1,9 +1,10 @@
 package v1
 
 import (
-	"github.com/carbonfive/go-filecoin-rest-api/handlers"
-	"github.com/carbonfive/go-filecoin-rest-api/types"
 	"net/http"
+
+	"github.com/filecoin-project/go-http-api/handlers"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 type CreateMessageHandler struct {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 func TestMarshalErrors(t *testing.T) {

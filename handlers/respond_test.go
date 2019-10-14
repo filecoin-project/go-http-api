@@ -2,12 +2,13 @@ package handlers_test
 
 import (
 	"errors"
-	"github.com/carbonfive/go-filecoin-rest-api/handlers"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/filecoin-project/go-http-api/handlers"
 )
 
 func TestRespond(t *testing.T) {

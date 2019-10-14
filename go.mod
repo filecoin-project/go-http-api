@@ -1,4 +1,4 @@
-module github.com/carbonfive/go-filecoin-rest-api
+module github.com/filecoin-project/go-http-api
 
 go 1.12
 

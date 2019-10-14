@@ -3,8 +3,8 @@ package v1_test
 import (
 	"testing"
 
-	server "github.com/carbonfive/go-filecoin-rest-api"
-	"github.com/carbonfive/go-filecoin-rest-api/test"
+	server "github.com/filecoin-project/go-http-api"
+	"github.com/filecoin-project/go-http-api/test"
 )
 
 func TestHelloHandler_ServeHTTP(t *testing.T) {

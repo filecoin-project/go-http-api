@@ -1,12 +1,12 @@
 package v1
 
 import (
-	"github.com/carbonfive/go-filecoin-rest-api/handlers"
 	"net/http"
 
 	"github.com/go-chi/chi"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/handlers"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 // ActorHandler is a handler for the actors/{actorId} endpoint

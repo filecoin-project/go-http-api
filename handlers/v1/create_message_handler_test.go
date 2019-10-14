@@ -3,15 +3,17 @@ package v1_test
 import (
 	"encoding/json"
 	"errors"
-	v1 "github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
-	"github.com/carbonfive/go-filecoin-rest-api/types"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 func TestCreateMessageHandler_ServeHTTP(t *testing.T) {

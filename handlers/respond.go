@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 func Respond(w http.ResponseWriter, result interface{}, cberr error) {

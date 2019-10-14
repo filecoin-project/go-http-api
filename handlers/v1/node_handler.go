@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"github.com/carbonfive/go-filecoin-rest-api/handlers"
+	"github.com/filecoin-project/go-http-api/handlers"
 	"net/http"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 // NodeHandler is the handler for the control/node endpoint

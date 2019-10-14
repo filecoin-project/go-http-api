@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 type MessageHandler struct {
@@ -23,14 +23,14 @@ func (mh *MessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		marshaled = types.MarshalErrors([]string{err.Error()})
 	} else {
 		msg.Kind = "message"
-		if marshaled, err = json.Marshal(msg) ; err != nil {
+		if marshaled, err = json.Marshal(msg); err != nil {
 			log.Error(err)
 			return
 		}
 	}
 
 	w.WriteHeader(http.StatusOK)
-	if _,err = fmt.Fprint(w, string(marshaled[:])); err != nil {
+	if _, err = fmt.Fprint(w, string(marshaled[:])); err != nil {
 		log.Error(err)
 	}
 }

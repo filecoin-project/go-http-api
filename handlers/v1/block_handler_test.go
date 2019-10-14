@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	server "github.com/carbonfive/go-filecoin-rest-api"
-	v1 "github.com/carbonfive/go-filecoin-rest-api/handlers/v1"
-	"github.com/carbonfive/go-filecoin-rest-api/test"
-	"github.com/carbonfive/go-filecoin-rest-api/types"
+	server "github.com/filecoin-project/go-http-api"
+	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
+	"github.com/filecoin-project/go-http-api/test"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 func TestBlockHeaderHandler_ServeHTTP(t *testing.T) {

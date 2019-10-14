@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/carbonfive/go-filecoin-rest-api/types"
 	"github.com/stretchr/testify/assert"
 
-	server "github.com/carbonfive/go-filecoin-rest-api"
-	"github.com/carbonfive/go-filecoin-rest-api/test"
+	server "github.com/filecoin-project/go-http-api"
+	"github.com/filecoin-project/go-http-api/test"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 func TestNewHTTPServer(t *testing.T) {
