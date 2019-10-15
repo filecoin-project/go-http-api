@@ -1,7 +1,10 @@
 package v1
 
 import (
+	"errors"
 	"net/http"
+
+	"github.com/go-chi/render"
 
 	"github.com/filecoin-project/go-http-api/handlers"
 	"github.com/filecoin-project/go-http-api/types"
@@ -12,13 +15,13 @@ type CreateMessageHandler struct {
 }
 
 func (cmh *CreateMessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	newMsg := types.Message{}
-	if err := handlers.RequireParams(r, "to", "value", "gasPrice", "gasLimit", "method", "parameters"); err != nil {
-		handlers.Respond(w, newMsg, err)
-		return
-	}
-	if err := newMsg.BindRequest(r); err != nil {
-		handlers.Respond(w, newMsg, err)
+	var newMsg types.Message
+
+	if err := render.Bind(r, &newMsg); err != nil {
+		if err.Error() == "EOF" {
+			err = errors.New("missing message parameters")
+		}
+		handlers.RespondBadRequest(w, err)
 		return
 	}
 

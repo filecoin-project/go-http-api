@@ -20,3 +20,7 @@ func MarshalErrors(errlist []string) []byte {
 	}
 	return res
 }
+
+func MarshalError(err error) []byte {
+	return MarshalErrors([]string{err.Error()})
+}
