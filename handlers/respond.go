@@ -14,7 +14,7 @@ func Respond(w http.ResponseWriter, result interface{}, cberr error) {
 
 	if cberr != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		marshaled = types.MarshalErrors([]string{cberr.Error()})
+		marshaled = types.MarshalError(cberr)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		if marshaled, err = json.Marshal(result); err != nil {
@@ -23,6 +23,14 @@ func Respond(w http.ResponseWriter, result interface{}, cberr error) {
 		}
 	}
 
+	if _, err := fmt.Fprint(w, string(marshaled[:])); err != nil {
+		log.Error(err)
+	}
+}
+
+func RespondBadRequest(w http.ResponseWriter, err error) {
+	w.WriteHeader(http.StatusBadRequest)
+	marshaled := types.MarshalError(err)
 	if _, err := fmt.Fprint(w, string(marshaled[:])); err != nil {
 		log.Error(err)
 	}
