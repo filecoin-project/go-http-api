@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	server "github.com/filecoin-project/go-http-api"
+	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 	"github.com/filecoin-project/go-http-api/test"
 	"github.com/filecoin-project/go-http-api/types"
 )
@@ -32,7 +32,7 @@ func TestMessageHandler_ServeHTTP(t *testing.T) {
 			return &expected, nil
 		}
 
-		s := test.CreateTestServer(t, &server.V1Callbacks{GetMessageByID: testcb}, false).Run()
+		s := test.CreateTestServer(t, &v1.Callbacks{GetMessageByID: testcb}, false).Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()
@@ -50,7 +50,7 @@ func TestMessageHandler_ServeHTTP(t *testing.T) {
 			return nil, expected
 		}
 
-		s := test.CreateTestServer(t, &server.V1Callbacks{GetMessageByID: testcb}, false).Run()
+		s := test.CreateTestServer(t, &v1.Callbacks{GetMessageByID: testcb}, false).Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()

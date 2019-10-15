@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	server "github.com/filecoin-project/go-http-api"
 	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 	"github.com/filecoin-project/go-http-api/test"
 	"github.com/filecoin-project/go-http-api/types"
@@ -41,7 +40,7 @@ func TestBlockHeaderHandler_ServeHTTP(t *testing.T) {
 			return &tb, nil
 		}}
 
-		cbs := &server.V1Callbacks{GetBlockByID: bhh.Callback}
+		cbs := &v1.Callbacks{GetBlockByID: bhh.Callback}
 		s := test.CreateTestServer(t, cbs, false)
 		s.Run()
 		defer func() {

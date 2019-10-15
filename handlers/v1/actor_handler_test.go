@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	server "github.com/filecoin-project/go-http-api"
+	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 	"github.com/filecoin-project/go-http-api/test"
 	"github.com/filecoin-project/go-http-api/types"
 )
@@ -27,7 +27,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 			return &fa, nil
 		}
 
-		s := test.CreateTestServer(t, &server.V1Callbacks{GetActorByID: acb}, false).Run()
+		s := test.CreateTestServer(t, &v1.Callbacks{GetActorByID: acb}, false).Run()
 		defer func() {
 			assert.NoError(t, s.Shutdown())
 		}()
@@ -46,7 +46,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 			return nil, errors.New("this is an error")
 		}
 
-		cbs := &server.V1Callbacks{GetActorByID: acb}
+		cbs := &v1.Callbacks{GetActorByID: acb}
 		test.AssertServerResponse(t, cbs, false, "actors/1111", string(errs[:]))
 	})
 }

@@ -12,27 +12,11 @@ import (
 	"github.com/go-chi/chi"
 
 	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
-	"github.com/filecoin-project/go-http-api/types"
 )
 
 const DefaultPort = ":8080"
 
 var log = logging.Logger("rest-api-server")
-
-// V1Callbacks is a struct for callbacks configurable for the given API endpoint,
-// shown by the 'path' tag
-// To add a new endpoint:
-//   * Write a new handler to use a new V1Callback, with tests
-//   * Add a new callback name/signature to V1Callbacks
-//   * Add a case to SetupV1Handlers that uses the callback
-type V1Callbacks struct {
-	GetActorByID   func(string) (*types.Actor, error)
-	GetActors      func() ([]*types.Actor, error)
-	GetBlockByID   func(string) (*types.Block, error)
-	CreateMessage  func(*types.Message) (*types.Message, error)
-	GetMessageByID func(string) (*types.Message, error)
-	GetNode        func() (*types.Node, error)
-}
 
 // HTTPAPI is a struct containing all the things needed to serve the Filecoin HTTP API
 type HTTPAPI struct {
@@ -51,9 +35,9 @@ type Config struct {
 	TLSKeyPath  string
 }
 
-// NewHTTPAPI creates and returns a *HTTPAPI using the provided context, *V1Callbacks,
+// NewHTTPAPI creates and returns a *HTTPAPI using the provided context, *Callbacks,
 // and desired port. If port <= 0, port 8080 will be used.
-func NewHTTPAPI(ctx context.Context, cb1 *V1Callbacks, config Config) *HTTPAPI {
+func NewHTTPAPI(ctx context.Context, cb1 *v1.Callbacks, config Config) *HTTPAPI {
 	chimux := chi.NewRouter()
 
 	lport := DefaultPort
@@ -135,7 +119,7 @@ func (s *HTTPAPI) Config() Config {
 
 // SetupV1Handlers takes a V1Callback struct and iterates over all
 // functions, creating a handler with a callback for each supported endpoint.
-func SetupV1Handlers(cb *V1Callbacks) *map[string]http.Handler {
+func SetupV1Handlers(cb *v1.Callbacks) *map[string]http.Handler {
 	cb1t := reflect.TypeOf(*cb)
 	cb1v := reflect.ValueOf(*cb)
 

@@ -7,15 +7,15 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"net/url"
 	"testing"
-
-	server "github.com/filecoin-project/go-http-api"
 
 	"github.com/ipfs/go-cid"
 	"github.com/multiformats/go-multihash"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	server "github.com/filecoin-project/go-http-api"
+	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 )
 
 // GetFreePort gets a free port from the kernel
@@ -43,11 +43,6 @@ func RequireGetFreePort(t *testing.T) int {
 func RequireGetResponseBody(t *testing.T, port int, path string) []byte {
 	uri := fmt.Sprintf("http://localhost:%d/api/filecoin/v1/%s", port, path)
 	return getResponseBody(t, uri)
-}
-
-func RequirePostFormResponseBody(t *testing.T, port int, path string, params url.Values) []byte {
-	uri := fmt.Sprintf("http://localhost:%d/api/filecoin/v1/%s", port, path)
-	return postFormResponseBody(t, uri, params)
 }
 
 func RequireGetResponseBodySSL(t *testing.T, port int, path string) []byte {
@@ -87,23 +82,7 @@ func getResponseBody(t *testing.T, uri string) []byte {
 	return body
 }
 
-func postFormResponseBody(t *testing.T, uri string, params url.Values) []byte {
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-	client := &http.Client{Transport: tr}
-
-	resp, err := client.PostForm(uri, params)
-	require.NoError(t, err)
-	require.Greater(t, 201, resp.StatusCode)
-	defer func() {
-		require.NoError(t, resp.Body.Close())
-	}()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	require.NoError(t, err)
-	return body
-}
-
-func CreateTestServer(t *testing.T, callbacks *server.V1Callbacks, ssl bool) *server.HTTPAPI {
+func CreateTestServer(t *testing.T, callbacks *v1.Callbacks, ssl bool) *server.HTTPAPI {
 	cfg := server.Config{Port: RequireGetFreePort(t)}
 	if ssl {
 		cfg.TLSCertPath = "test/fixtures/cert.pem"
@@ -113,7 +92,7 @@ func CreateTestServer(t *testing.T, callbacks *server.V1Callbacks, ssl bool) *se
 	return server.NewHTTPAPI(context.Background(), callbacks, cfg)
 }
 
-func AssertServerResponse(t *testing.T, callbacks *server.V1Callbacks, ssl bool, path string, expected string) {
+func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path string, expected string) {
 	s := CreateTestServer(t, callbacks, ssl)
 
 	s.Run()

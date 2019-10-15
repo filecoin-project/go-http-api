@@ -123,8 +123,7 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 }
 
 func RequireHTTPPost(t *testing.T, path string, body io.Reader) *http.Request {
-	req, err := http.NewRequest("POST", path, body)
-	require.NoError(t, err)
+	req := httptest.NewRequest("POST", "http://localhost/"+path, body)
 	require.NotNil(t, req)
 	return req
 }
