@@ -4,9 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/go-chi/chi"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/ipfs/go-cid"
@@ -17,6 +19,11 @@ import (
 	server "github.com/filecoin-project/go-http-api"
 	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 )
+
+type Param struct {
+	Key   string
+	Value string
+}
 
 // GetFreePort gets a free port from the kernel
 // Credit: https://github.com/phayes/freeport
@@ -101,4 +108,21 @@ func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path 
 	}()
 
 	AssertGetResponseBody(t, s.Config().Port, ssl, path, expected)
+}
+
+func TestGetHandler(h http.Handler, uri string, params *[]Param) (*http.Response, []byte) {
+	r, _ := http.NewRequest("GET", uri, nil)
+	w := httptest.NewRecorder()
+
+	rctx := chi.NewRouteContext()
+	if params != nil {
+		for _, el := range *params {
+			rctx.URLParams.Add(el.Key, el.Value)
+		}
+	}
+
+	r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+
+	h.ServeHTTP(w, r)
+	return w.Result(), w.Body.Bytes()
 }

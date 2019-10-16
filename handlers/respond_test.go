@@ -2,6 +2,7 @@ package handlers_test
 
 import (
 	"errors"
+	"github.com/filecoin-project/go-http-api/types"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -24,11 +25,23 @@ func TestRespond(t *testing.T) {
 		assert.Equal(t, `{"Data":"abcd"}`, rw.Body.String())
 	})
 
-	t.Run("responds with serialized errors", func(t *testing.T) {
+	t.Run("error from callback responds with serialized errors & server error", func(t *testing.T) {
 		rw := httptest.NewRecorder()
-		handlers.Respond(rw, nil, errors.New("boom"))
+		err := errors.New("boom")
+		handlers.Respond(rw, nil, err)
 
-		assert.Equal(t, http.StatusBadRequest, rw.Code)
-		assert.Equal(t, `{"errors":["boom"]}`, rw.Body.String())
+		assert.Equal(t, http.StatusInternalServerError, rw.Code)
+		assert.Equal(t, types.MarshalError(err), rw.Body.Bytes())
 	})
+}
+
+func TestRespondBadRequest(t *testing.T) {
+	w := httptest.NewRecorder()
+	err := errors.New("boom")
+	expBody := types.MarshalError(err)
+
+	handlers.RespondBadRequest(w, err)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, expBody, w.Body.Bytes())
 }

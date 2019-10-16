@@ -13,6 +13,7 @@ import (
 type DefaultHandler struct {
 }
 
+// ServeHTTP handles an HTTP request.
 func (hh *DefaultHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ep := html.EscapeString(r.RequestURI)
 	if _, err := fmt.Fprintf(w, "%s is not implemented", ep); err != nil {

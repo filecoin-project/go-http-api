@@ -2,15 +2,15 @@ package v1_test
 
 import (
 	"encoding/json"
-	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
-	"github.com/stretchr/testify/require"
+	"errors"
 	"math/big"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 	"github.com/filecoin-project/go-http-api/test"
 	"github.com/filecoin-project/go-http-api/test/fixtures"
 	"github.com/filecoin-project/go-http-api/types"
@@ -42,17 +42,28 @@ func TestActorsHandler_ServeHTTP(t *testing.T) {
 			return []*types.Actor{&a1, &a2}, nil
 		}
 
-		req := httptest.NewRequest("GET", path, nil)
-		rr := httptest.NewRecorder()
-		handler := v1.ActorsHandler{Callback: acb}
-		handler.ServeHTTP(rr, req)
+		h := v1.ActorsHandler{Callback: acb}
+		resp, body := test.TestGetHandler(&h, path, nil)
 
-		assert.Equal(t, http.StatusOK, rr.Code)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
 		var actual []types.Actor
-		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &actual))
+		require.NoError(t, json.Unmarshal(body, &actual))
 
 		require.Len(t, actual, 2)
 		assert.Equal(t, a1, actual[0])
 		assert.Equal(t, a2, actual[1])
+	})
+
+	t.Run("Returns error message with server error if callback fails", func(t *testing.T) {
+		expectedErrs := types.MarshalErrors([]string{"boom"})
+
+		acb := func() ([]*types.Actor, error) {
+			return []*types.Actor{}, errors.New("boom")
+		}
+
+		h := v1.ActorsHandler{Callback: acb}
+		resp, body := test.TestGetHandler(&h, path, nil)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		assert.Equal(t, expectedErrs, body)
 	})
 }

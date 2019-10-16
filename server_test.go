@@ -47,4 +47,9 @@ func TestHTTPServer_Run(t *testing.T) {
 		cbs := &v1.Callbacks{}
 		test.AssertServerResponse(t, cbs, false, "foo", "404 page not found\n")
 	})
+
+	t.Run("if a handler was not provided a callback, returns 'is not implemented'", func(t *testing.T) {
+		cbs := &v1.Callbacks{}
+		test.AssertServerResponse(t, cbs, false, "control/node", "/api/filecoin/v1/control/node is not implemented")
+	})
 }
