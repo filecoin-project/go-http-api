@@ -1,10 +1,9 @@
 package v1
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
+	"github.com/filecoin-project/go-http-api/handlers"
 	"github.com/filecoin-project/go-http-api/types"
 )
 
@@ -15,23 +14,6 @@ type ActorsHandler struct {
 
 // ServeHTTP handles an HTTP request.
 func (a *ActorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var marshaled []byte
 	result, err := a.Callback()
-
-	if err != nil {
-		marshaled = types.MarshalErrors([]string{err.Error()})
-	} else {
-		for _, el := range result {
-			el.Kind = "actor"
-		}
-		if marshaled, err = json.Marshal(result); err != nil {
-			log.Error(err)
-			return
-		}
-	}
-
-	w.WriteHeader(http.StatusOK)
-	if _, err = fmt.Fprint(w, string(marshaled[:])); err != nil {
-		log.Error(err)
-	}
+	handlers.Respond(w, result, err)
 }

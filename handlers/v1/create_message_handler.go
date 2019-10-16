@@ -10,10 +10,12 @@ import (
 	"github.com/filecoin-project/go-http-api/types"
 )
 
+// CreateMessageHandler is a handler for the /chain/messages endpoint
 type CreateMessageHandler struct {
 	Callback func(*types.Message) (*types.Message, error)
 }
 
+// ServeHTTP handles an HTTP request.
 func (cmh *CreateMessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var newMsg types.Message
 

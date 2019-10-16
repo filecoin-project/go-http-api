@@ -3,7 +3,6 @@ package v1_test
 import (
 	"encoding/json"
 	"errors"
-	"io"
 	"math/big"
 	"net/http"
 	"net/http/httptest"
@@ -19,7 +18,8 @@ import (
 )
 
 func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
-	path := "chain/messages"
+	uri := "http://localhost/chain/messages"
+
 	t.Run("Message is 'created' and returned if callback succeeds", func(t *testing.T) {
 		expectedMsg := types.Message{
 			To:         "someaddr",
@@ -48,7 +48,8 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 
 		jsonBody, err := json.Marshal(expectedMsg)
 		require.NoError(t, err)
-		req := RequireHTTPPost(t, path, strings.NewReader(string(jsonBody[:])))
+
+		req := httptest.NewRequest("POST", uri, strings.NewReader(string(jsonBody[:])))
 		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
@@ -63,24 +64,19 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("if body (message) is not provided, responds with error", func(t *testing.T) {
-		req := RequireHTTPPost(t, path, strings.NewReader(""))
+		req := httptest.NewRequest("POST", uri, strings.NewReader(""))
 		req.Header.Set("Content-Type", "application/json")
 
 		req.PostForm = url.Values{}
 		rr := httptest.NewRecorder()
-		cb := func(*types.Message) (*types.Message, error) {
-			return &types.Message{}, errors.New("should not happen")
-		}
-		handler := v1.CreateMessageHandler{Callback: cb}
+		handler := v1.CreateMessageHandler{
+			Callback: func(*types.Message) (*types.Message, error) {
+				return &types.Message{}, errors.New("should not happen")
+			}}
 		handler.ServeHTTP(rr, req)
 
-		// Check the status code is what we expect.
-		if status := rr.Code; status == http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				status, http.StatusBadRequest)
-		}
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
 
-		// Check the response body is what we expect.
 		expected := types.APIErrorResponse{Errors: []string{
 			"missing message parameters",
 		}}
@@ -93,38 +89,25 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 		expectedMsg := types.Message{To: "someaddr"}
 		jsonBody, err := json.Marshal(expectedMsg)
 		require.NoError(t, err)
-		req := RequireHTTPPost(t, path, strings.NewReader(string(jsonBody[:])))
+		req := httptest.NewRequest("POST", uri, strings.NewReader(string(jsonBody[:])))
 		req.Header.Set("Content-Type", "application/json")
 
 		req.PostForm = url.Values{}
 		rr := httptest.NewRecorder()
-		cb := func(*types.Message) (*types.Message, error) {
-			return &types.Message{}, errors.New("should not happen")
-		}
-		handler := v1.CreateMessageHandler{Callback: cb}
-		handler.ServeHTTP(rr, req)
+		h := v1.CreateMessageHandler{
+			Callback: func(*types.Message) (*types.Message, error) {
+				return &types.Message{}, errors.New("should not happen")
+			}}
+		h.ServeHTTP(rr, req)
 
-		// Check the status code is what we expect.
-		if status := rr.Code; status == http.StatusOK {
-			t.Errorf("handler returned wrong status code: got %v want %v",
-				status, http.StatusBadRequest)
-		}
+		assert.Equal(t, http.StatusBadRequest, rr.Code)
 
-		// Check the response body is what we expect.
 		expected := types.APIErrorResponse{Errors: []string{
 			"missing parameters: GasLimit,Method",
 		}}
 		var actual types.APIErrorResponse
 		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &actual))
 		assert.Equal(t, expected, actual)
-
 	})
 
-}
-
-func RequireHTTPPost(t *testing.T, path string, body io.Reader) *http.Request {
-	req, err := http.NewRequest("POST", path, body)
-	require.NoError(t, err)
-	require.NotNil(t, req)
-	return req
 }
