@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+// Message is a struct representing a Filecoin message.
+// Parameter are parameters for the Method from the HTTP request and are passed to the Callback unparsed.
 type Message struct {
 	Kind       string   `json:"kind,required,omitempty"`
 	ID         string   `json:"id,omitempty"`

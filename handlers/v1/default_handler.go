@@ -10,8 +10,7 @@ import (
 // not provided a callback when the API was created.  Note this is distinct from
 // 404 Not Found which is the response to a request for a non-existent, unsupported
 // endpoint.
-type DefaultHandler struct {
-}
+type DefaultHandler struct{}
 
 // ServeHTTP handles an HTTP request.
 func (hh *DefaultHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

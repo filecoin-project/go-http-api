@@ -21,6 +21,7 @@ func (cmh *CreateMessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 
 	if err := render.Bind(r, &newMsg); err != nil {
 		if err.Error() == "EOF" {
+			// message body was blank
 			err = errors.New("missing message parameters")
 		}
 		handlers.RespondBadRequest(w, err)
