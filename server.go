@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"reflect"
 	"time"
 
 	logging "github.com/ipfs/go-log"
@@ -57,7 +56,7 @@ func NewHTTPAPI(ctx context.Context, cb1 *v1.Callbacks, config Config) *HTTPAPI 
 		srv:    s,
 		chimux: chimux,
 		hello:  &v1.HelloHandler{},
-		v1h:    SetupV1Handlers(cb1),
+		v1h:    cb1.BuildHandlers(),
 		config: config,
 	}
 }
@@ -94,6 +93,7 @@ func (s *HTTPAPI) Route() {
 			r.Get("/blocks/{blockId}", handlers["GetBlockByID"].ServeHTTP)
 			r.Get("/executed-messages/{executedMessageId}", handlers["GetMessageByID"].ServeHTTP)
 			r.Post("/messages", handlers["CreateMessage"].ServeHTTP)
+			r.Post("/signed-messages", handlers["SendSignedMessage"].ServeHTTP)
 		})
 		r.Route("/actors", func(r chi.Router) {
 			r.Get("/", handlers["GetActors"].ServeHTTP)
@@ -115,41 +115,4 @@ func (s *HTTPAPI) Router() chi.Router {
 // Config returns a copy of the config
 func (s *HTTPAPI) Config() Config {
 	return s.config
-}
-
-// SetupV1Handlers takes a V1Callback struct and iterates over all
-// functions, creating a handler with a callback for each supported endpoint.
-func SetupV1Handlers(cb *v1.Callbacks) *map[string]http.Handler {
-	cb1t := reflect.TypeOf(*cb)
-	cb1v := reflect.ValueOf(*cb)
-
-	numCallbacks := cb1t.NumField()
-	handlers := make(map[string]http.Handler, numCallbacks)
-
-	for i := 0; i < numCallbacks; i++ {
-		fieldName := cb1t.Field(i).Name
-
-		fieldValue := cb1v.Field(i)
-		if fieldValue.IsNil() {
-			handlers[fieldName] = &v1.DefaultHandler{}
-		} else {
-			switch fieldName {
-			case "GetBlockByID":
-				handlers[fieldName] = &v1.BlockHandler{Callback: cb.GetBlockByID}
-			case "GetActors":
-				handlers[fieldName] = &v1.ActorsHandler{Callback: cb.GetActors}
-			case "GetActorByID":
-				handlers[fieldName] = &v1.ActorHandler{Callback: cb.GetActorByID}
-			case "CreateMessage":
-				handlers[fieldName] = &v1.CreateMessageHandler{Callback: cb.CreateMessage}
-			case "GetMessageByID":
-				handlers[fieldName] = &v1.MessageHandler{Callback: cb.GetMessageByID}
-			case "GetNode":
-				handlers[fieldName] = &v1.NodeHandler{Callback: cb.GetNode}
-			default:
-				log.Errorf("skipping unknown handler: %s.", fieldName)
-			}
-		}
-	}
-	return &handlers
 }

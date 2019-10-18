@@ -6,18 +6,19 @@ import (
 	"net/http"
 )
 
+// Message is a struct representing a Filecoin message.
+// Parameter are parameters for the Method from the HTTP request and are passed to the Callback unparsed.
 type Message struct {
-	Kind       string   `json:"kind,required,omitempty"`
+	Kind       string   `json:"kind,omitempty"`
 	ID         string   `json:"id,omitempty"`
 	Nonce      uint64   `json:"nonce,omitempty"`
 	From       string   `json:"from,omitempty"`
-	To         string   `json:"to,required,omitempty"`
-	Value      *big.Int `json:"value,required,omitempty"`    // in AttoFIL
-	GasPrice   *big.Int `json:"gasPrice,required,omitempty"` // in AttoFIL
-	GasLimit   uint64   `json:"gasLimit,required,omitempty"` // in GasUnits
-	Method     string   `json:"method,required,omitempty"`
-	Parameters []string `json:"parameters,required"`
-	Signature  string   `json:"signature,omitempty"`
+	To         string   `json:"to,omitempty"`
+	Value      *big.Int `json:"value,omitempty"`    // in AttoFIL
+	GasPrice   *big.Int `json:"gasPrice,omitempty"` // in AttoFIL
+	GasLimit   uint64   `json:"gasLimit,omitempty"` // in GasUnits
+	Method     string   `json:"method,omitempty"`
+	Parameters []string `json:"parameters,omitempty"`
 }
 
 func (m Message) MarshalJSON() ([]byte, error) {
