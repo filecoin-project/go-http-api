@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"math/big"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,21 +50,11 @@ func TestMessageHandler_ServeHTTP(t *testing.T) {
 			return nil, expected
 		}
 
-		s := test.CreateTestServer(t, &v1.Callbacks{GetMessageByID: testcb}, false).Run()
-		defer func() {
-			assert.NoError(t, s.Shutdown())
-		}()
+		h := &v1.MessageHandler{Callback: testcb}
+		rr := test.GetTestRequest("http://localhost:3000/chain/executed-messages/1234", nil, h)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 
-		body := test.RequireGetResponseBody(t, s.Config().Port, "chain/executed-messages/someid")
-		var actual types.Message
-		var apiErr types.APIErrorResponse
-
-		undefMsg := types.Message{}
-		assert.NoError(t, json.Unmarshal(body, &actual))
-		assert.Equal(t, undefMsg, actual)
-
-		assert.NoError(t, json.Unmarshal(body, &apiErr))
-		assert.Len(t, apiErr.Errors, 1)
-		assert.Equal(t, "boom!", apiErr.Errors[0])
+		exp := types.MarshalError(expected)
+		assert.Equal(t, exp, rr.Body.Bytes())
 	})
 }

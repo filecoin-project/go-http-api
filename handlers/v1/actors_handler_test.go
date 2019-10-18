@@ -24,14 +24,14 @@ func TestActorsHandler_ServeHTTP(t *testing.T) {
 			Address:   fixtures.TestAddress0,
 			Balance:   big.NewInt(600),
 			Code:      test.RequireTestCID(t, []byte("actor1")),
-			Nonce:     21,
+			Nonce:     big.NewInt(21),
 			Head:      test.RequireTestCID(t, []byte("head")),
 		}
 		a2 := types.Actor{
 			ActorType: "miner",
 			Address:   fixtures.TestAddress1,
 			Code:      test.RequireTestCID(t, []byte("actor2")),
-			Nonce:     10,
+			Nonce:     big.NewInt(10),
 			Balance:   big.NewInt(2100),
 			Head:      test.RequireTestCID(t, []byte("head1")),
 		}
@@ -42,12 +42,12 @@ func TestActorsHandler_ServeHTTP(t *testing.T) {
 			return []*types.Actor{&a1, &a2}, nil
 		}
 
-		h := v1.ActorsHandler{Callback: acb}
-		resp, body := test.TestGetHandler(&h, path, nil)
+		h := &v1.ActorsHandler{Callback: acb}
+		rr := test.GetTestRequest(path, nil, h)
 
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Equal(t, http.StatusOK, rr.Code)
 		var actual []types.Actor
-		require.NoError(t, json.Unmarshal(body, &actual))
+		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &actual))
 
 		require.Len(t, actual, 2)
 		assert.Equal(t, a1, actual[0])
@@ -61,9 +61,9 @@ func TestActorsHandler_ServeHTTP(t *testing.T) {
 			return []*types.Actor{}, errors.New("boom")
 		}
 
-		h := v1.ActorsHandler{Callback: acb}
-		resp, body := test.TestGetHandler(&h, path, nil)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-		assert.Equal(t, expectedErrs, body)
+		h := &v1.ActorsHandler{Callback: acb}
+		rr := test.GetTestRequest(path, nil, h)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, expectedErrs, rr.Body.Bytes())
 	})
 }

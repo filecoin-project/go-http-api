@@ -26,12 +26,12 @@ func TestActor_ServeHTTP(t *testing.T) {
 		}}
 		params := &[]test.Param{{Key: "actorId", Value: "1111"}}
 
-		resp, body := test.TestGetHandler(h, uri, params)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		rr := test.GetTestRequest(uri, params, h)
+		assert.Equal(t, http.StatusOK, rr.Code)
 
 		fa.Kind = "actor"
 		var actual types.Actor
-		require.NoError(t, json.Unmarshal(body, &actual))
+		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &actual))
 		assert.Equal(t, *fa, actual)
 	})
 
@@ -41,12 +41,12 @@ func TestActor_ServeHTTP(t *testing.T) {
 		acb := func(actorId string) (*types.Actor, error) {
 			return nil, errors.New("this is an error")
 		}
-		h := v1.ActorHandler{Callback: acb}
-		params := []test.Param{{Key: "actorId", Value: "1111"}}
+		h := &v1.ActorHandler{Callback: acb}
+		params := &[]test.Param{{Key: "actorId", Value: "1111"}}
 
-		resp, body := test.TestGetHandler(&h, uri, &params)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-		assert.Equal(t, errs, body)
+		rr := test.GetTestRequest(uri, params, h)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, errs, rr.Body.Bytes())
 	})
 }
 
@@ -76,6 +76,6 @@ func requireCreateTestActor(t *testing.T, addr string) *types.Actor {
 		Address:   addr,
 		Balance:   big.NewInt(600),
 		Code:      test.RequireTestCID(t, []byte("anything")),
-		Nonce:     123434,
+		Nonce:     big.NewInt(123434),
 	}
 }
