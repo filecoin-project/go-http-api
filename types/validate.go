@@ -9,12 +9,30 @@ import (
 func RequireFields(m interface{}, params ...string) error {
 	var missing []string
 	mval := reflect.ValueOf(m)
-	for _, el := range params {
-		val := reflect.Indirect(mval).FieldByName(el)
-		valType := val.Type().Name()
-		if valType == "string" && val.Interface().(string) == "" ||
-			valType == "uint64" && val.Interface().(uint64) == 0 {
-			missing = append(missing, el)
+	for _, param := range params {
+		val := reflect.Indirect(mval).FieldByName(param)
+		valKind := val.Kind().String()
+		isMissing := false
+		switch valKind {
+		case "string":
+			if val.Interface().(string) == "" {
+				isMissing = true
+			}
+		case "uint64":
+			if val.Interface().(uint64) == 0 {
+				isMissing = true
+			}
+		case "ptr":
+			if val.IsNil() {
+				isMissing = true
+			}
+		case "slice":
+			if val.IsNil() {
+				isMissing = true
+			}
+		}
+		if isMissing {
+			missing = append(missing, param)
 		}
 	}
 	if len(missing) > 0 {

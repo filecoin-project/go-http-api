@@ -19,7 +19,6 @@ type Message struct {
 	GasLimit   uint64   `json:"gasLimit,required,omitempty"` // in GasUnits
 	Method     string   `json:"method,required,omitempty"`
 	Parameters []string `json:"parameters,required"`
-	Signature  string   `json:"signature,omitempty"`
 }
 
 func (m Message) MarshalJSON() ([]byte, error) {
@@ -30,5 +29,5 @@ func (m Message) MarshalJSON() ([]byte, error) {
 }
 
 func (m *Message) Bind(r *http.Request) error {
-	return RequireFields(m, "To", "Value", "GasPrice", "GasLimit", "Method")
+	return RequireFields(m, "To", "Value", "GasPrice", "GasLimit", "Method", "Parameters")
 }

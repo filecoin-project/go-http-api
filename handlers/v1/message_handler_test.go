@@ -26,7 +26,6 @@ func TestMessageHandler_ServeHTTP(t *testing.T) {
 			GasLimit:   10,
 			Method:     "createMiner",
 			Parameters: nil,
-			Signature:  "somesig",
 		}
 		testcb := func(msgId string) (*types.Message, error) {
 			return &expected, nil

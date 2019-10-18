@@ -9,7 +9,7 @@ import (
 )
 
 type SignedMessageHandler struct {
-	Callback func(*types.SignedMessage) (*types.Message, error)
+	Callback func(*types.SignedMessage) (*types.SignedMessage, error)
 }
 
 func (ssmh *SignedMessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

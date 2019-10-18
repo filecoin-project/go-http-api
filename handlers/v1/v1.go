@@ -2,7 +2,9 @@ package v1
 
 import (
 	"github.com/filecoin-project/go-http-api/types"
+	"github.com/ipfs/go-cid"
 	logging "github.com/ipfs/go-log"
+	"math/big"
 	"net/http"
 	"reflect"
 )
@@ -18,13 +20,15 @@ var log = logging.Logger("rest-api-handlers")
 //   * Add a new callback name/signature to Callbacks
 //   * Add a case to BuildHandlers that uses the callback
 type Callbacks struct {
-	GetActorByID      func(string) (*types.Actor, error)
-	GetActors         func() ([]*types.Actor, error)
-	GetBlockByID      func(string) (*types.Block, error)
-	CreateMessage     func(*types.Message) (*types.Message, error)
-	SendSignedMessage func(*types.SignedMessage) (*types.Message, error)
-	GetMessageByID    func(string) (*types.Message, error)
-	GetNode           func() (*types.Node, error)
+	GetActorByID        func(string) (*types.Actor, error)
+	GetActors           func() ([]*types.Actor, error)
+	GetBlockByID        func(string) (*types.Block, error)
+	CreateMessage       func(*types.Message) (*types.Message, error)
+	CreateSignedMessage func(*types.SignedMessage) (*types.SignedMessage, error)
+	GetMessageByID      func(string) (*types.Message, error)
+	GetNode             func() (*types.Node, error)
+	SendSignedMessage   func(*types.SignedMessage) (*types.SignedMessage, error)
+	WaitForMessage      func(cid *cid.Cid, limitBH *big.Int) (bH *big.Int, err error)
 }
 
 // BuildHandlers takes a V1Callback struct and iterates over all

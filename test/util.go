@@ -5,10 +5,12 @@ import (
 	"crypto/tls"
 	"fmt"
 	"github.com/go-chi/chi"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/ipfs/go-cid"
@@ -125,4 +127,13 @@ func TestGetHandler(h http.Handler, uri string, params *[]Param) (*http.Response
 
 	h.ServeHTTP(w, r)
 	return w.Result(), w.Body.Bytes()
+}
+
+func PostTestRequest(uri string, body io.Reader, h http.Handler) *httptest.ResponseRecorder {
+	req := httptest.NewRequest("POST", uri, body)
+	req.Header.Set("Content-Type", "application/json")
+	req.PostForm = url.Values{}
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, req)
+	return rr
 }

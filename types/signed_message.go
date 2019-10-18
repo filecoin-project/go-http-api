@@ -1,19 +1,15 @@
 package types
 
 import (
-	"errors"
 	"net/http"
 )
 
-// SignedMessage is a struct representing a complete signed message in binary format,
-// sent to the HTTP API as Content-Type: application/octet-stream
+// SignedMessage is a struct representing a signed message to be posted in the message pool.
 type SignedMessage struct {
-	MessageBlob []byte `json:"messageBlob,required"`
+	Message
+	Signature string `json:"signature,omitempty"`
 }
 
 func (sm *SignedMessage) Bind(r *http.Request) error {
-	if len(sm.MessageBlob) == 0 {
-		return errors.New("messageBlob is missing")
-	}
-	return nil
+	return RequireFields(sm, "To", "Value", "GasPrice", "GasLimit", "Method", "Parameters", "Signature")
 }
