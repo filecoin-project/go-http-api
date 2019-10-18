@@ -42,6 +42,9 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 
 		var executedMsg types.Message
 		expectedMsg.Kind = "message"
+		expectedMsg.ID = "sll3525ieiaghaQOEI582slkd0LKDFIeoiwRDeus"
+		expectedMsg.From = "t27syykyps4puabw5fol3kn4n7flp44dz772hk3sq"
+		expectedMsg.Nonce = 878
 
 		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &executedMsg))
 		assert.Equal(t, expectedMsg, executedMsg)
@@ -56,11 +59,9 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 		rr := test.PostTestRequest(uri, strings.NewReader(string(jsonBody[:])), h)
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 
-		expected := types.MarshalErrors([]string{"something"})
+		expected := types.MarshalErrorStrings("boom")
 
-		var actual types.APIErrorResponse
-		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &actual))
-		assert.Equal(t, expected, actual)
+		assert.Equal(t, expected, rr.Body.Bytes())
 
 	})
 
@@ -70,10 +71,8 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 
-		expected := types.MarshalErrors([]string{"missing message parameters"})
-		var actual types.APIErrorResponse
-		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &actual))
-		assert.Equal(t, expected, actual)
+		expected := types.MarshalErrorStrings("missing message parameters")
+		assert.Equal(t, expected, rr.Body.Bytes())
 	})
 
 	t.Run("if required parameters are not provided, responds with error", func(t *testing.T) {
@@ -91,7 +90,7 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 
 		expected := types.APIErrorResponse{Errors: []string{
-			"missing parameters: GasLimit,Method",
+			"missing parameters: Value,GasPrice,GasLimit,Method",
 		}}
 		var actual types.APIErrorResponse
 		require.NoError(t, json.Unmarshal(rr.Body.Bytes(), &actual))
@@ -116,6 +115,6 @@ func happyPathCallback(message *types.Message) (*types.Message, error) {
 }
 
 func sadPathCallback(message *types.Message) (*types.Message, error) {
-	return &types.Message{}, errors.New("should not happen")
+	return &types.Message{}, errors.New("boom")
 
 }

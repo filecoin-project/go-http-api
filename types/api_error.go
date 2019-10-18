@@ -14,8 +14,8 @@ func IrrecoverableError() APIErrorResponse {
 	return APIErrorResponse{Errors: []string{"irrecoverable error"}}
 }
 
-// MarshalErrors takes a list of strings, and returns a marshaled APIErrorResponse
-func MarshalErrors(errlist []string) []byte {
+// MarshalErrorStrings takes a list of strings, and returns a marshaled APIErrorResponse
+func MarshalErrorStrings(errlist ...string) []byte {
 	errs := APIErrorResponse{Errors: errlist}
 	res, err := json.Marshal(errs)
 	if err != nil {
@@ -26,5 +26,5 @@ func MarshalErrors(errlist []string) []byte {
 
 // MarshalError takes an error and returns a marshaled APIErrorResponse
 func MarshalError(err error) []byte {
-	return MarshalErrors([]string{err.Error()})
+	return MarshalErrorStrings(err.Error())
 }

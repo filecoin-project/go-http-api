@@ -16,5 +16,5 @@ func TestMarshalErrors(t *testing.T) {
 
 	testErrJSON, _ := json.Marshal(testErr)
 
-	assert.Equal(t, types.MarshalErrors(msgs), testErrJSON)
+	assert.Equal(t, types.MarshalErrorStrings("a", "b"), testErrJSON)
 }

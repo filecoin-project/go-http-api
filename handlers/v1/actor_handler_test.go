@@ -36,7 +36,7 @@ func TestActor_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("Callback errors are returned w/ server error status", func(t *testing.T) {
-		errs := types.MarshalErrors([]string{"this is an error"})
+		errs := types.MarshalErrorStrings("this is an error")
 
 		acb := func(actorId string) (*types.Actor, error) {
 			return nil, errors.New("this is an error")

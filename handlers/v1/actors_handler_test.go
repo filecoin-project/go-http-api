@@ -55,7 +55,7 @@ func TestActorsHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("Returns error message with server error if callback fails", func(t *testing.T) {
-		expectedErrs := types.MarshalErrors([]string{"boom"})
+		expectedErrs := types.MarshalErrorStrings("boom")
 
 		acb := func() ([]*types.Actor, error) {
 			return []*types.Actor{}, errors.New("boom")
