@@ -8,7 +8,7 @@ A package that provides an HTTP REST API for a Filecoin implementation written i
 * Response body is JSON.
 * POST request bodies are expected to be JSON.
 * SSL/TLS supported
-* Bearer auth scheme supported
+* Bearer auth scheme supported (SOON)
 
 ## Install
 ```
