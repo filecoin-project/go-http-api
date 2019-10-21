@@ -2,7 +2,6 @@ package v1
 
 import (
 	"fmt"
-	"html"
 	"net/http"
 
 	"github.com/filecoin-project/go-http-api/handlers"
@@ -15,7 +14,7 @@ type HelloHandler struct {
 
 // ServeHTTP handles an HTTP request.
 func (hh *HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if _, err := fmt.Fprint(w, "HELLO", html.EscapeString(r.RequestURI)); err != nil {
+	if _, err := fmt.Fprint(w, "HELLO"); err != nil {
 		handlers.Respond(w, "hello", err)
 	}
 }

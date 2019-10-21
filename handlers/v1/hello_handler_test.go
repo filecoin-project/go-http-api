@@ -10,6 +10,6 @@ import (
 func TestHelloHandler_ServeHTTP(t *testing.T) {
 	t.Run("basic hello returns good response", func(t *testing.T) {
 		cbs := &v1.Callbacks{}
-		test.AssertServerResponse(t, cbs, false, "hello", "/api/filecoin/v1/hello, world!")
+		test.AssertServerResponse(t, cbs, false, "hello", "HELLO")
 	})
 }

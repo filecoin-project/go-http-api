@@ -19,19 +19,19 @@ func TestNewHTTPServer(t *testing.T) {
 			assert.NoError(t, s.Shutdown())
 		}()
 
-		test.AssertGetResponseBody(t, 8080, false, "hello", "/api/filecoin/v1/hello, world!")
+		test.AssertGetResponseBody(t, 8080, false, "hello", "HELLO")
 	})
 }
 
 func TestHTTPServer_Run(t *testing.T) {
 	t.Run("basic hello returns good response", func(t *testing.T) {
 		cbs := &v1.Callbacks{}
-		test.AssertServerResponse(t, cbs, false, "hello", "/api/filecoin/v1/hello, world!")
+		test.AssertServerResponse(t, cbs, false, "hello", "HELLO")
 	})
 
 	t.Run("HTTPS requests", func(t *testing.T) {
 		cbs := &v1.Callbacks{}
-		test.AssertServerResponse(t, cbs, true, "hello", "/api/filecoin/v1/hello, world!")
+		test.AssertServerResponse(t, cbs, true, "hello", "HELLO")
 	})
 
 	t.Run("calls correct handler if a callback for it was provided", func(t *testing.T) {
