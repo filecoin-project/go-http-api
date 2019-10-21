@@ -112,9 +112,9 @@ func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path 
 	AssertGetResponseBody(t, s.Config().Port, ssl, path, expected)
 }
 
-func TestGetHandler(h http.Handler, uri string, params *[]Param) (*http.Response, []byte) {
-	r, _ := http.NewRequest("GET", uri, nil)
-	w := httptest.NewRecorder()
+func GetTestRequest(uri string, params *[]Param, h http.Handler) *httptest.ResponseRecorder {
+	req, _ := http.NewRequest("GET", uri, nil)
+	rr := httptest.NewRecorder()
 
 	rctx := chi.NewRouteContext()
 	if params != nil {
@@ -123,10 +123,10 @@ func TestGetHandler(h http.Handler, uri string, params *[]Param) (*http.Response
 		}
 	}
 
-	r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
+	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
 
-	h.ServeHTTP(w, r)
-	return w.Result(), w.Body.Bytes()
+	h.ServeHTTP(rr, req)
+	return rr
 }
 
 func PostTestRequest(uri string, body io.Reader, h http.Handler) *httptest.ResponseRecorder {

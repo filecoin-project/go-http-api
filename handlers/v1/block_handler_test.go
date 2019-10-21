@@ -25,13 +25,13 @@ func TestBlockHandler_ServeHTTP(t *testing.T) {
 		h := &v1.BlockHandler{Callback: func(blockId string) (*types.Block, error) {
 			return tb, nil
 		}}
-		resp, body := test.TestGetHandler(h, uri, &params)
+		rr := test.GetTestRequest(uri, &params, h)
 
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Equal(t, http.StatusOK, rr.Code)
 
 		tb.Kind = "block"
 		expected, _ := json.Marshal(*tb)
-		assert.Equal(t, expected, body)
+		assert.Equal(t, expected, rr.Body.Bytes())
 	})
 
 	t.Run("if callback errors, returns server error status + error msg", func(t *testing.T) {
@@ -39,11 +39,11 @@ func TestBlockHandler_ServeHTTP(t *testing.T) {
 		h := &v1.BlockHandler{Callback: func(blockId string) (*types.Block, error) {
 			return &types.Block{}, err
 		}}
-		resp, body := test.TestGetHandler(h, uri, &params)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		rr := test.GetTestRequest(uri, &params, h)
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 
 		expected := types.MarshalError(err)
-		assert.Equal(t, expected, body)
+		assert.Equal(t, expected, rr.Body.Bytes())
 	})
 }
 

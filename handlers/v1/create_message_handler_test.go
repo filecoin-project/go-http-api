@@ -37,7 +37,7 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		rr := httptest.NewRecorder()
 
-		handler := v1.CreateMessageHandler{Callback: happyPathCallback}
+		handler := v1.CreateMessageHandler{Callback: happyPathCMCallback}
 		handler.ServeHTTP(rr, req)
 
 		var executedMsg types.Message
@@ -51,7 +51,7 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("if callback fails, responds with error", func(t *testing.T) {
-		h := &v1.CreateMessageHandler{Callback: sadPathCallback}
+		h := &v1.CreateMessageHandler{Callback: sadPathCMCallback}
 
 		jsonBody, err := json.Marshal(expectedMsg)
 		require.NoError(t, err)
@@ -66,7 +66,7 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("if body (message) is not provided, responds with error", func(t *testing.T) {
-		h := &v1.CreateMessageHandler{Callback: happyPathCallback}
+		h := &v1.CreateMessageHandler{Callback: happyPathCMCallback}
 		rr := test.PostTestRequest(uri, strings.NewReader(""), h)
 
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -84,7 +84,7 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 
 		req.PostForm = url.Values{}
 		rr := httptest.NewRecorder()
-		h := v1.CreateMessageHandler{Callback: happyPathCallback}
+		h := v1.CreateMessageHandler{Callback: happyPathCMCallback}
 		h.ServeHTTP(rr, req)
 
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
@@ -99,7 +99,7 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 
 }
 
-func happyPathCallback(message *types.Message) (*types.Message, error) {
+func happyPathCMCallback(message *types.Message) (*types.Message, error) {
 	msg := types.Message{
 		ID:         "sll3525ieiaghaQOEI582slkd0LKDFIeoiwRDeus",
 		Nonce:      878,
@@ -114,7 +114,7 @@ func happyPathCallback(message *types.Message) (*types.Message, error) {
 	return &msg, nil
 }
 
-func sadPathCallback(message *types.Message) (*types.Message, error) {
+func sadPathCMCallback(message *types.Message) (*types.Message, error) {
 	return &types.Message{}, errors.New("boom")
 
 }

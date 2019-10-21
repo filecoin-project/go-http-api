@@ -97,7 +97,10 @@ func (s *HTTPAPI) Route() {
 		})
 		r.Route("/actors", func(r chi.Router) {
 			r.Get("/", handlers["GetActors"].ServeHTTP)
-			r.Get("/{actorId}", handlers["GetActorByID"].ServeHTTP)
+			r.Route("/{actorId}", func(r chi.Router) {
+				r.Get("/", handlers["GetActorByID"].ServeHTTP)
+				r.Get("/nonce", handlers["GetActorNonce"].ServeHTTP)
+			})
 		})
 	})
 }

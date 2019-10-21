@@ -1,12 +1,14 @@
 package v1
 
 import (
-	"github.com/filecoin-project/go-http-api/types"
-	"github.com/ipfs/go-cid"
-	logging "github.com/ipfs/go-log"
 	"math/big"
 	"net/http"
+	"net/url"
 	"reflect"
+
+	logging "github.com/ipfs/go-log"
+
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 // For needed package-level items
@@ -20,15 +22,39 @@ var log = logging.Logger("rest-api-handlers")
 //   * Add a new callback name/signature to Callbacks
 //   * Add a case to BuildHandlers that uses the callback
 type Callbacks struct {
-	GetActorByID        func(string) (*types.Actor, error)
-	GetActors           func() ([]*types.Actor, error)
-	GetBlockByID        func(string) (*types.Block, error)
-	CreateMessage       func(*types.Message) (*types.Message, error)
+	// GetActorByID retrieves an Actor by its ID
+	GetActorByID func(string) (*types.Actor, error)
+
+	// GetActorNonce is specifically for retrieving the actor nonce in preparation for sending a signed message.
+	GetActorNonce func(string) (*big.Int, error)
+
+	// GetActors retrieves known information about all Actors of the node
+	GetActors func() ([]*types.Actor, error)
+
+	// GetBlockByID retrieves the BlockHeader, Messages and Receipts for the Block
+	GetBlockByID func(string) (*types.Block, error)
+
+	// CreateMessage creates and sends an unsigned Message
+	CreateMessage func(*types.Message) (*types.Message, error)
+
+	// CreateSignedMessage creates and sends a SignedMessage using the node's default
+	// account
 	CreateSignedMessage func(*types.SignedMessage) (*types.SignedMessage, error)
-	GetMessageByID      func(string) (*types.Message, error)
-	GetNode             func() (*types.Node, error)
-	SendSignedMessage   func(*types.SignedMessage) (*types.SignedMessage, error)
-	WaitForMessage      func(cid *cid.Cid, limitBH *big.Int) (bH *big.Int, err error)
+
+	// GetMessageByID fetches a Message by its CID
+	GetMessageByID func(string) (*types.Message, error)
+
+	// GetNode gets information about the node that implements this API
+	GetNode func() (*types.Node, error)
+
+	// SendSignedMessage posts an already signed message to the message pool.
+	// Since actor Nonce is required to sign a message, the caller must first
+	// know the actor nonce.  See GetActorNonce
+	SendSignedMessage func(*types.SignedMessage) (*types.SignedMessage, error)
+
+	// WaitForMessage waits for a message to appear on chain until the given block height.
+	// When the message appears on chain, it posts to the callback URI with the block height and the message id as a JSON payload
+	WaitForMessage func(id string, bh *big.Int, url url.URL) (bH *big.Int, err error)
 }
 
 // BuildHandlers takes a V1Callback struct and iterates over all
@@ -54,6 +80,8 @@ func (cb *Callbacks) BuildHandlers() *map[string]http.Handler {
 				handlers[fieldName] = &ActorsHandler{Callback: cb.GetActors}
 			case "GetActorByID":
 				handlers[fieldName] = &ActorHandler{Callback: cb.GetActorByID}
+			case "GetActorNonce":
+				handlers[fieldName] = &ActorNonceHandler{Callback: cb.GetActorNonce}
 			case "CreateMessage":
 				handlers[fieldName] = &CreateMessageHandler{Callback: cb.CreateMessage}
 			case "GetMessageByID":
