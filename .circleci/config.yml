@@ -1,4 +1,8 @@
 version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.0.2
+
 jobs:
   build: # runs not using Workflows must have a `build` job as entry point
     docker: # run the steps with Docker
