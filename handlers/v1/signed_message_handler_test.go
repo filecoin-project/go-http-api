@@ -58,7 +58,7 @@ func TestSignedMessageHandler_ServeHTTP(t *testing.T) {
 		h := &v1.SignedMessageHandler{Callback: happyPathSMCallback}
 		rr := test.PostTestRequest(uri, strings.NewReader(string(msgBody[:])), h)
 
-		expBody := types.MarshalErrorStrings("missing parameters: From,Value,GasPrice,GasLimit,Method")
+		expBody := types.MarshalErrorStrings("missing parameters: From,Nonce,Value,GasPrice,GasLimit,Method")
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 		assert.Equal(t, expBody, rr.Body.Bytes())
 	})

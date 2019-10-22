@@ -1,13 +1,13 @@
 package types_test
 
 import (
-	"github.com/filecoin-project/go-http-api/test"
-	"github.com/filecoin-project/go-http-api/types"
-	"github.com/ipfs/go-cid"
-	"github.com/magiconair/properties/assert"
-	"github.com/stretchr/testify/require"
 	"math/big"
 	"testing"
+
+	"github.com/ipfs/go-cid"
+
+	"github.com/filecoin-project/go-http-api/test"
+	"github.com/filecoin-project/go-http-api/types"
 )
 
 func TestBlock_MarshalJSON(t *testing.T) {
@@ -24,17 +24,12 @@ func TestBlock_MarshalJSON(t *testing.T) {
 			},
 		}
 		expected := `{"kind":"block","ID":{"/":"bafyreib5znwh4i7pjxrtna4kzfuvhwnfklazpz6pe5ih4je2tyv7wmyesa"},"header":{"kind":"blockHeader","minerAddress":"abcd","parentWeight":1,"height":10,"parentStateRoot":null,"parentMessageReceipts":null,"messages":null,"timestamp":38383838}}`
-		m, err := b.MarshalJSON()
-		require.NoError(t, err)
-		assert.Equal(t, expected, string(m[:]))
+		test.AssertMarshaledEquals(t, b, expected)
 	})
 	t.Run("empty struct is correctly serialized and includes Kind field", func(t *testing.T) {
-		emptyB := types.Block{}
+		b := types.Block{}
 		expected := `{"kind":"block","ID":null,"header":{"kind":"blockHeader","parentStateRoot":null,"parentMessageReceipts":null,"messages":null}}`
-		m, err := emptyB.MarshalJSON()
-		require.NoError(t, err)
-		assert.Equal(t, expected, string(m[:]))
-
+		test.AssertMarshaledEquals(t, b, expected)
 	})
 }
 
@@ -62,17 +57,13 @@ func TestBlockHeader_MarshalJSON(t *testing.T) {
 		}
 
 		expected := `{"kind":"blockHeader","minerAddress":"abcd","tickets":["YWJjZA=="],"electionProof":"ZGNiYQ==","parents":[{"/":"bafyreib5znwh4i7pjxrtna4kzfuvhwnfklazpz6pe5ih4je2tyv7wmyesa"}],"parentWeight":1,"height":10,"parentStateRoot":{"/":"bafyreihsffulhx7afspy7vmg3mo7nsau556h2kwlrtxjdvrpyg5iqgg33q"},"parentMessageReceipts":{"/":"bafyreiazoneogbvm4nsws53a2cbouhvb5ggaq7shpsoyjyyndkb4oft5wm"},"messages":{"/":"bafyreiazoneogbvm4nsws53a2cbouhvb5ggaq7shpsoyjyyndkb4oft5wm"},"blsAggregate":"YmxzYWdn","timestamp":38383838,"blockSig":"YmxvY2tzaWc="}`
-		m, err := bh.MarshalJSON()
-		require.NoError(t, err)
-		assert.Equal(t, expected, string(m[:]))
+		test.AssertMarshaledEquals(t, bh, expected)
 	})
 
 	t.Run("empty struct json omits all but special types and includes Kind field", func(t *testing.T) {
 		emptyBh := types.BlockHeader{}
 
 		expected := `{"kind":"blockHeader","parentStateRoot":null,"parentMessageReceipts":null,"messages":null}`
-		m, err := emptyBh.MarshalJSON()
-		require.NoError(t, err)
-		assert.Equal(t, expected, string(m[:]))
+		test.AssertMarshaledEquals(t, emptyBh, expected)
 	})
 }

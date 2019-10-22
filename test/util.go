@@ -137,3 +137,13 @@ func PostTestRequest(uri string, body io.Reader, h http.Handler) *httptest.Respo
 	h.ServeHTTP(rr, req)
 	return rr
 }
+
+type Marshaler interface {
+	MarshalJSON() ([]byte, error)
+}
+
+func AssertMarshaledEquals(t *testing.T, m Marshaler, expected string) {
+	marshaled, err := m.MarshalJSON()
+	require.NoError(t, err)
+	assert.Equal(t, expected, string(marshaled[:]))
+}

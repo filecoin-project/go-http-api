@@ -10,7 +10,7 @@ import (
 // because of the need  to marshal as JSON.  Embedding Message causes json.Marshal to strip the Signature field.
 // This is unlikely to be fixed: https://github.com/golang/go/issues/31167
 type SignedMessage struct {
-	Kind       string   `json:"kind,omitempty"`
+	Kind       string   `json:"kind,required"`
 	ID         string   `json:"id,omitempty"`
 	Nonce      uint64   `json:"nonce,omitempty"`
 	From       string   `json:"from,omitempty"`
@@ -24,5 +24,5 @@ type SignedMessage struct {
 }
 
 func (sm *SignedMessage) Bind(r *http.Request) error {
-	return RequireFields(sm, "To", "From", "Value", "GasPrice", "GasLimit", "Method", "Signature")
+	return RequireFields(sm, "To", "From", "Nonce", "Value", "GasPrice", "GasLimit", "Method", "Signature")
 }

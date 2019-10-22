@@ -38,7 +38,7 @@ func TestHTTPServer_Run(t *testing.T) {
 		}
 
 		cbs := &v1.Callbacks{GetNode: nidcb}
-		test.AssertServerResponse(t, cbs, false, "control/node", `{"node":"node","protocol":{},"bitswapStats":{}}`)
+		test.AssertServerResponse(t, cbs, false, "control/node", `{"kind":"node","protocol":{},"bitswapStats":{}}`)
 	})
 
 	t.Run("returns 404 when a path does not match", func(t *testing.T) {

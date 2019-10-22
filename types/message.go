@@ -9,7 +9,7 @@ import (
 // Message is a struct representing a Filecoin message.
 // Parameter are parameters for the Method from the HTTP request and are passed to the Callback unparsed.
 type Message struct {
-	Kind       string   `json:"kind,omitempty"`
+	Kind       string   `json:"kind,required"`
 	ID         string   `json:"id,omitempty"`
 	Nonce      uint64   `json:"nonce,omitempty"`
 	From       string   `json:"from,omitempty"`
