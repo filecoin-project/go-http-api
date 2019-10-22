@@ -1,12 +1,13 @@
 package types_test
 
 import (
-	"github.com/filecoin-project/go-http-api/test"
-	"github.com/stretchr/testify/assert"
 	"math/big"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/filecoin-project/go-http-api/test"
 	"github.com/filecoin-project/go-http-api/test/fixtures"
 	. "github.com/filecoin-project/go-http-api/types"
 )
