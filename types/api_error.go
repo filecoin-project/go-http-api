@@ -9,18 +9,10 @@ type APIErrorResponse struct {
 	Errors []string `json:"errors,omitempty"`
 }
 
-// IrrecoverableError is an error message for when even a simple statement fails
-func IrrecoverableError() APIErrorResponse {
-	return APIErrorResponse{Errors: []string{"irrecoverable error"}}
-}
-
 // MarshalErrorStrings takes a list of strings, and returns a marshaled APIErrorResponse
 func MarshalErrorStrings(errlist ...string) []byte {
 	errs := APIErrorResponse{Errors: errlist}
-	res, err := json.Marshal(errs)
-	if err != nil {
-		res, _ = json.Marshal(IrrecoverableError())
-	}
+	res, _ := json.Marshal(errs) // nolint: errcheck
 	return res
 }
 

@@ -16,7 +16,7 @@ type Block struct {
 }
 
 type BlockHeader struct {
-	Kind                  string    `json:"kind,required,omitempty"`
+	Kind                  string    `json:"kind,required"`
 	Miner                 string    `json:"minerAddress,omitempty"`
 	Tickets               [][]byte  `json:"tickets,omitempty"`
 	ElectionProof         []byte    `json:"electionProof,omitempty"`
