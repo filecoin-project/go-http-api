@@ -106,7 +106,7 @@ func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path 
 
 	s.Run()
 	defer func() {
-		assert.NoError(t, s.Shutdown())
+		s.Shutdown() // nolint: errcheck
 	}()
 
 	AssertGetResponseBody(t, s.Config().Port, ssl, path, expected)
