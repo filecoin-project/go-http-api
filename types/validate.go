@@ -30,6 +30,8 @@ func RequireFields(m interface{}, params ...string) error {
 			if val.IsNil() {
 				isMissing = true
 			}
+		case "invalid":
+			return fmt.Errorf("%s is not part of struct %s", param, reflect.TypeOf(m).Name())
 		}
 		if isMissing {
 			missing = append(missing, param)

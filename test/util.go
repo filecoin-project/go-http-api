@@ -106,7 +106,7 @@ func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path 
 
 	s.Run()
 	defer func() {
-		assert.NoError(t, s.Shutdown())
+		s.Shutdown() // nolint: errcheck
 	}()
 
 	AssertGetResponseBody(t, s.Config().Port, ssl, path, expected)
@@ -136,4 +136,14 @@ func PostTestRequest(uri string, body io.Reader, h http.Handler) *httptest.Respo
 	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, req)
 	return rr
+}
+
+type Marshaler interface {
+	MarshalJSON() ([]byte, error)
+}
+
+func AssertMarshaledEquals(t *testing.T, m Marshaler, expected string) {
+	marshaled, err := m.MarshalJSON()
+	require.NoError(t, err)
+	assert.Equal(t, expected, string(marshaled[:]))
 }

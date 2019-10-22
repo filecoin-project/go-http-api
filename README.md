@@ -3,6 +3,7 @@
 A package that provides an HTTP REST API for a Filecoin implementation written in go.
 
 [![CircleCI](https://circleci.com/gh/filecoin-project/go-http-api.svg?style=svg)](https://circleci.com/gh/filecoin-project/go-http-api)
+[![codecov](https://codecov.io/gh/filecoin-project/go-http-api/branch/master/graph/badge.svg)](https://codecov.io/gh/filecoin-project/go-http-api)
 
 ## Features
 * Response body is JSON.

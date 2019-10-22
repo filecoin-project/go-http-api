@@ -10,8 +10,6 @@ jobs:
       - image: circleci/golang:1.12
       # CircleCI PostgreSQL images available at: https://hub.docker.com/r/circleci/postgres/
 
-    parallelism: 2
-
     environment: # environment variables for the build itself
       TEST_RESULTS: /tmp/test-results # path to where test results will be saved
 
@@ -24,7 +22,7 @@ jobs:
 
       - restore_cache: # restores saved cache if no changes are detected since last run
           keys:
-            - go-mod-v4-{{ checksum "go.sum" }}
+            - v1-pkg-cache
 
       - run:
           name: Run unit tests
@@ -32,6 +30,11 @@ jobs:
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- -cover -coverprofile coverage.out -covermode=atomic -parallel=2 $PACKAGE_NAMES
             mv coverage.out /tmp/test-results/coverage.out
+      - save_cache: # Store cache in the /go/pkg directory
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
+
       - codecov/upload:
           file: /tmp/test-results/coverage.out
       - store_artifacts: # upload test summary for display in Artifacts

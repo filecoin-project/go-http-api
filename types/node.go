@@ -13,7 +13,7 @@ type BitswapStats struct{}
 
 // Node contains the Node level Filecoin information
 type Node struct {
-	Kind         string       `json:"node,required"`
+	Kind         string       `json:"kind,required"`
 	Id           string       `json:"id,omitempty"`
 	Addresses    []string     `json:"addresses,omitempty"`
 	Version      string       `json:"version,omitempty"`

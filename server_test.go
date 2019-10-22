@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	server "github.com/filecoin-project/go-http-api"
 	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 	"github.com/filecoin-project/go-http-api/test"
@@ -16,7 +14,7 @@ func TestNewHTTPServer(t *testing.T) {
 	t.Run("if port is <=0 the default of :8080 will be used.", func(t *testing.T) {
 		s := server.NewHTTPAPI(context.Background(), &v1.Callbacks{}, server.Config{}).Run()
 		defer func() {
-			assert.NoError(t, s.Shutdown())
+			s.Shutdown() // nolint: errcheck
 		}()
 
 		test.AssertGetResponseBody(t, 8080, false, "hello", "HELLO")
@@ -40,7 +38,7 @@ func TestHTTPServer_Run(t *testing.T) {
 		}
 
 		cbs := &v1.Callbacks{GetNode: nidcb}
-		test.AssertServerResponse(t, cbs, false, "control/node", `{"node":"node","protocol":{},"bitswapStats":{}}`)
+		test.AssertServerResponse(t, cbs, false, "control/node", `{"kind":"node","protocol":{},"bitswapStats":{}}`)
 	})
 
 	t.Run("returns 404 when a path does not match", func(t *testing.T) {
