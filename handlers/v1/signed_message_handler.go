@@ -8,10 +8,12 @@ import (
 	"net/http"
 )
 
+// SignedMessageHandler is the handler for the POST /chain/messages/ endpoint
 type SignedMessageHandler struct {
 	Callback func(*types.SignedMessage) (*types.SignedMessage, error)
 }
 
+// ServeHTTP handles an HTTP request.
 func (ssmh *SignedMessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var newMsg types.SignedMessage
 

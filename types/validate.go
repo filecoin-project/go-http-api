@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+// RequireFields iterates over object `m` and returns error if any fields listed in
+// `params` are nil/zero value
 func RequireFields(m interface{}, params ...string) error {
 	var missing []string
 	mval := reflect.ValueOf(m)

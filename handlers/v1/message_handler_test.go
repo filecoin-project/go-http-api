@@ -45,7 +45,7 @@ func TestMessageHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("GetMessageByID passes on errors returned by Callback", func(t *testing.T) {
-		expected := errors.New("boom!")
+		expected := errors.New("boom")
 		testcb := func(msgId string) (*types.Message, error) {
 			return nil, expected
 		}

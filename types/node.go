@@ -13,8 +13,8 @@ type BitswapStats struct{}
 
 // Node contains the Node level Filecoin information
 type Node struct {
-	Kind         string       `json:"kind,required"`
-	Id           string       `json:"id,omitempty"`
+	Kind         string       `json:"kind"`
+	ID           string       `json:"id,omitempty"`
 	Addresses    []string     `json:"addresses,omitempty"`
 	Version      string       `json:"version,omitempty"`
 	Commit       string       `json:"commit,omitempty"`
@@ -22,6 +22,7 @@ type Node struct {
 	BitswapStats BitswapStats `json:"bitswapStats,omitempty"`
 }
 
+// MarshalJSON marshals a Node struct
 func (n Node) MarshalJSON() ([]byte, error) {
 	type alias Node
 	out := alias(n)

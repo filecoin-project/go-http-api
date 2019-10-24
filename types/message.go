@@ -9,7 +9,7 @@ import (
 // Message is a struct representing a Filecoin message.
 // Parameter are parameters for the Method from the HTTP request and are passed to the Callback unparsed.
 type Message struct {
-	Kind       string   `json:"kind,required"`
+	Kind       string   `json:"kind"`
 	ID         string   `json:"id,omitempty"`
 	Nonce      uint64   `json:"nonce,omitempty"`
 	From       string   `json:"from,omitempty"`
@@ -21,6 +21,7 @@ type Message struct {
 	Parameters []string `json:"parameters,omitempty"`
 }
 
+// MarshalJSON marshals a Message struct
 func (m Message) MarshalJSON() ([]byte, error) {
 	type alias Message
 	out := alias(m)
@@ -28,6 +29,8 @@ func (m Message) MarshalJSON() ([]byte, error) {
 	return json.Marshal(out)
 }
 
+// Bind does any additional setup needed for binding an http request body to
+// a Message object
 func (m *Message) Bind(r *http.Request) error {
 	return RequireFields(m, "To", "Value", "GasPrice", "GasLimit", "Method")
 }

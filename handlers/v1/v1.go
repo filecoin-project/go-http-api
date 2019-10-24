@@ -3,9 +3,9 @@ package v1
 import (
 	"math/big"
 	"net/http"
-	"net/url"
 	"reflect"
 
+	"github.com/ipfs/go-cid"
 	logging "github.com/ipfs/go-log"
 
 	"github.com/filecoin-project/go-http-api/types"
@@ -54,7 +54,7 @@ type Callbacks struct {
 
 	// WaitForMessage waits for a message to appear on chain until the given block height.
 	// When the message appears on chain, it posts to the callback URI with the block height and the message id as a JSON payload
-	WaitForMessage func(id string, bh *big.Int, url url.URL) (bH *big.Int, err error)
+	WaitForMessage func(cid cid.Cid, bh *big.Int) (bH *big.Int, err error)
 }
 
 // BuildHandlers takes a V1Callback struct and iterates over all

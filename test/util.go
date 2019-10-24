@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/go-chi/chi"
 	"io"
 	"io/ioutil"
 	"net"
@@ -13,6 +12,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/go-chi/chi"
 	"github.com/ipfs/go-cid"
 	"github.com/multiformats/go-multihash"
 	"github.com/stretchr/testify/assert"
@@ -22,6 +22,7 @@ import (
 	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 )
 
+// Param is a struct for constructing URL form params
 type Param struct {
 	Key   string
 	Value string
@@ -43,22 +44,27 @@ func GetFreePort() (int, error) {
 	return l.Addr().(*net.TCPAddr).Port, nil
 }
 
+// RequireGetFreePort fails the test if GetFreePort fails
 func RequireGetFreePort(t *testing.T) int {
 	port, err := GetFreePort()
 	require.NoError(t, err)
 	return port
 }
 
+// RequireGetResponseBody fails the test if getResponseBody fails
 func RequireGetResponseBody(t *testing.T, port int, path string) []byte {
 	uri := fmt.Sprintf("http://localhost:%d/api/filecoin/v1/%s", port, path)
 	return getResponseBody(t, uri)
 }
 
+// RequireGetResponseBodySSL fails the test if getResponseBody fails
 func RequireGetResponseBodySSL(t *testing.T, port int, path string) []byte {
 	uri := fmt.Sprintf("https://localhost:%d/api/filecoin/v1/%s", port, path)
 	return getResponseBody(t, uri)
 }
 
+// AssertGetResponseBody asserts that response body for a GET call using the provided
+// arguments equals `exp`
 func AssertGetResponseBody(t *testing.T, port int, ssl bool, path string, exp string) {
 	var body []byte
 
@@ -70,12 +76,15 @@ func AssertGetResponseBody(t *testing.T, port int, ssl bool, path string, exp st
 	assert.Equal(t, exp, string(body[:]))
 }
 
+// RequireTestCID generates a new random cid.Cid
 func RequireTestCID(t *testing.T, data []byte) cid.Cid {
 	hash, err := multihash.Sum(data, multihash.SHA2_256, -1)
 	require.NoError(t, err)
 	return cid.NewCidV1(cid.DagCBOR, hash)
 }
 
+// getResponseBody gets a response from a running http server and returns it as
+// []byte
 func getResponseBody(t *testing.T, uri string) []byte {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	client := &http.Client{Transport: tr}
@@ -91,6 +100,7 @@ func getResponseBody(t *testing.T, uri string) []byte {
 	return body
 }
 
+// CreateTestServer creates a real http server for testing
 func CreateTestServer(t *testing.T, callbacks *v1.Callbacks, ssl bool) *server.HTTPAPI {
 	cfg := server.Config{Port: RequireGetFreePort(t)}
 	if ssl {
@@ -101,17 +111,19 @@ func CreateTestServer(t *testing.T, callbacks *v1.Callbacks, ssl bool) *server.H
 	return server.NewHTTPAPI(context.Background(), callbacks, cfg)
 }
 
-func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path string, expected string) {
+// AssertServerResponse creates an http test server, sends a request and asserts that
+// the response body is equal to `exp`
+func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path string, exp string) {
 	s := CreateTestServer(t, callbacks, ssl)
 
 	s.Run()
-	defer func() {
-		s.Shutdown() // nolint: errcheck
-	}()
+	defer s.Shutdown() // nolint: errcheck
 
-	AssertGetResponseBody(t, s.Config().Port, ssl, path, expected)
+	AssertGetResponseBody(t, s.Config().Port, ssl, path, exp)
 }
 
+// GetTestRequest sets up a request to uri with url params via httptest, calls the
+// provided handler, and returns the new recorder with the response stored.
 func GetTestRequest(uri string, params *[]Param, h http.Handler) *httptest.ResponseRecorder {
 	req, _ := http.NewRequest("GET", uri, nil)
 	rr := httptest.NewRecorder()
@@ -129,6 +141,8 @@ func GetTestRequest(uri string, params *[]Param, h http.Handler) *httptest.Respo
 	return rr
 }
 
+// PostTestRequest sets up a post request to `uri` with a JSON `body`, calls the
+// provided handler `h` and returns the new recorder with the response stored.
 func PostTestRequest(uri string, body io.Reader, h http.Handler) *httptest.ResponseRecorder {
 	req := httptest.NewRequest("POST", uri, body)
 	req.Header.Set("Content-Type", "application/json")
@@ -138,12 +152,16 @@ func PostTestRequest(uri string, body io.Reader, h http.Handler) *httptest.Respo
 	return rr
 }
 
-type Marshaler interface {
+// Marshalable is an interface that has a `MarshalJSON` func, for use by
+// AssertMarshaledEquals
+type Marshalable interface {
 	MarshalJSON() ([]byte, error)
 }
 
-func AssertMarshaledEquals(t *testing.T, m Marshaler, expected string) {
+// AssertMarshaledEquals asserts that the marshaled version of the Marshalable `m` equals
+// `exp`
+func AssertMarshaledEquals(t *testing.T, m Marshalable, exp string) {
 	marshaled, err := m.MarshalJSON()
 	require.NoError(t, err)
-	assert.Equal(t, expected, string(marshaled[:]))
+	assert.Equal(t, exp, string(marshaled[:]))
 }

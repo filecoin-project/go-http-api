@@ -16,7 +16,7 @@ type ActorHandler struct {
 
 // ServeHTTP handles an HTTP request.
 func (a *ActorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	actorId := chi.URLParam(r, "actorId")
-	actor, err := a.Callback(actorId)
+	actorID := chi.URLParam(r, "actorID")
+	actor, err := a.Callback(actorID)
 	handlers.Respond(w, actor, err)
 }

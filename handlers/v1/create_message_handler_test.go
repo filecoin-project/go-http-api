@@ -6,7 +6,6 @@ import (
 	"math/big"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"strings"
 	"testing"
 
@@ -82,7 +81,6 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 		req := httptest.NewRequest("POST", uri, strings.NewReader(string(jsonBody[:])))
 		req.Header.Set("Content-Type", "application/json")
 
-		req.PostForm = url.Values{}
 		rr := httptest.NewRecorder()
 		h := v1.CreateMessageHandler{Callback: happyPathCMCallback}
 		h.ServeHTTP(rr, req)

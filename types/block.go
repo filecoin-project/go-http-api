@@ -7,16 +7,24 @@ import (
 	"github.com/ipfs/go-cid"
 )
 
-// BlockHeader is the struct for a Filecoin blockheader
-
+// Block is the internal struct for a Filecoin block
 type Block struct {
-	Kind   string `json:"kind,required"`
+	Kind   string `json:"kind"`
 	ID     cid.Cid
 	Header BlockHeader `json:"header"`
 }
 
+// MarshalJSON marshals a Block struct
+func (o Block) MarshalJSON() ([]byte, error) {
+	type alias Block
+	out := alias(o)
+	out.Kind = "block"
+	return json.Marshal(out)
+}
+
+// BlockHeader is the internal struct for a Filecoin blockheader
 type BlockHeader struct {
-	Kind                  string    `json:"kind,required"`
+	Kind                  string    `json:"kind"`
 	Miner                 string    `json:"minerAddress,omitempty"`
 	Tickets               [][]byte  `json:"tickets,omitempty"`
 	ElectionProof         []byte    `json:"electionProof,omitempty"`
@@ -31,13 +39,7 @@ type BlockHeader struct {
 	BlockSig              []byte    `json:"blockSig,omitempty"`
 }
 
-func (o Block) MarshalJSON() ([]byte, error) {
-	type alias Block
-	out := alias(o)
-	out.Kind = "block"
-	return json.Marshal(out)
-}
-
+// MarshalJSON marshals a BlockHeader struct
 func (o BlockHeader) MarshalJSON() ([]byte, error) {
 	type alias BlockHeader
 	out := alias(o)

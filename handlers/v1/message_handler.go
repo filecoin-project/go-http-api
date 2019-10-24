@@ -16,8 +16,8 @@ type MessageHandler struct {
 
 // ServeHTTP handles an HTTP request.
 func (mh *MessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	msgId := chi.URLParam(r, "messageId")
+	msgID := chi.URLParam(r, "messageId")
 
-	msg, err := mh.Callback(msgId)
+	msg, err := mh.Callback(msgID)
 	handlers.Respond(w, msg, err)
 }

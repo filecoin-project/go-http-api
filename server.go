@@ -13,6 +13,7 @@ import (
 	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 )
 
+// DefaultPort is the default port for the REST HTTP API
 const DefaultPort = ":8080"
 
 var log = logging.Logger("rest-api-server")
@@ -92,7 +93,10 @@ func (s *HTTPAPI) Route() {
 		r.Route("/chain", func(r chi.Router) {
 			r.Get("/blocks/{blockId}", handlers["GetBlockByID"].ServeHTTP)
 			r.Get("/executed-messages/{executedMessageId}", handlers["GetMessageByID"].ServeHTTP)
-			r.Post("/messages", handlers["CreateMessage"].ServeHTTP)
+			r.Route("/messages", func(r chi.Router) {
+				r.Get("/{messageId}", handlers["WaitForMessage"].ServeHTTP)
+				r.Post("/", handlers["CreateMessage"].ServeHTTP)
+			})
 			r.Post("/signed-messages", handlers["SendSignedMessage"].ServeHTTP)
 		})
 		r.Route("/actors", func(r chi.Router) {
