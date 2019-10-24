@@ -82,7 +82,19 @@ Assuming you have correctly implemented your callbacks, you should see familiar 
 
 Please see test files for more details. 
 
-# References
+## References
 * For a current map of endpoints to callbacks, see [`server.Route()`](https://github.com/filecoin-project/go-http-api/blob/516f52ea8f6e13c708613c42e087c346c1f39e2b/server.go#L84)
 * [Filecoin HTTP API Specification](https://github.com/filecoin-project/filecoin-http-api)
 * filecoin-project/go-filecoin [example implementation in a branch](https://github.com/filecoin-project/go-filecoin/tree/feat/rest-api-part1)
+
+## Contributing
+
+We ❤️ all our contributors; this project wouldn’t be what it is without you! If you want to help out, please see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+The Filecoin Project, including this repository, is dual-licensed under Apache 2.0 and MIT terms:
+
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+## [Copyright](COPYRIGHT)
