@@ -17,18 +17,17 @@ import (
 
 func TestMessageHandler_ServeHTTP(t *testing.T) {
 	t.Run("GetMessageByID accepts and uses param messageId", func(t *testing.T) {
-		expected := types.Message{
-			ID:         "someid",
-			Nonce:      98348,
-			From:       "abcd1234",
-			To:         "1234abcd",
-			Value:      big.NewInt(8383),
-			GasPrice:   big.NewInt(3432),
-			GasLimit:   10,
-			Method:     "createMiner",
-			Parameters: nil,
+		expected := types.SignedMessage{
+			ID:       "someid",
+			Nonce:    98348,
+			From:     "abcd1234",
+			To:       "1234abcd",
+			Value:    big.NewInt(8383),
+			GasPrice: big.NewInt(3432),
+			GasLimit: 10,
+			Method:   "createMiner",
 		}
-		testcb := func(msgId string) (*types.Message, error) {
+		testcb := func(msgId string) (*types.SignedMessage, error) {
 			return &expected, nil
 		}
 
@@ -38,15 +37,15 @@ func TestMessageHandler_ServeHTTP(t *testing.T) {
 		}()
 
 		body := test.RequireGetResponseBody(t, s.Config().Port, "chain/executed-messages/someid")
-		expected.Kind = "message"
-		var actual types.Message
+		expected.Kind = "signedMessage"
+		var actual types.SignedMessage
 		require.NoError(t, json.Unmarshal(body, &actual))
 		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("GetMessageByID passes on errors returned by Callback", func(t *testing.T) {
 		expected := errors.New("boom")
-		testcb := func(msgId string) (*types.Message, error) {
+		testcb := func(msgId string) (*types.SignedMessage, error) {
 			return nil, expected
 		}
 

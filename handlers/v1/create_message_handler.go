@@ -12,7 +12,7 @@ import (
 
 // CreateMessageHandler is a handler for the /chain/messages endpoint
 type CreateMessageHandler struct {
-	Callback func(*types.Message) (*types.Message, error)
+	Callback func(*types.Message) (*types.SignedMessage, error)
 }
 
 // ServeHTTP handles an HTTP request.

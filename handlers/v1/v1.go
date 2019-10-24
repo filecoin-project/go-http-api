@@ -35,14 +35,14 @@ type Callbacks struct {
 	GetBlockByID func(string) (*types.Block, error)
 
 	// CreateMessage creates and sends an unsigned Message
-	CreateMessage func(*types.Message) (*types.Message, error)
+	CreateMessage func(*types.Message) (*types.SignedMessage, error)
 
 	// CreateSignedMessage creates and sends a SignedMessage using the node's default
 	// account
 	CreateSignedMessage func(*types.SignedMessage) (*types.SignedMessage, error)
 
 	// GetMessageByID fetches a Message by its CID
-	GetMessageByID func(string) (*types.Message, error)
+	GetMessageByID func(string) (*types.SignedMessage, error)
 
 	// GetNode gets information about the node that implements this API
 	GetNode func() (*types.Node, error)

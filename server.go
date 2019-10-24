@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	logging "github.com/ipfs/go-log"
@@ -94,7 +96,7 @@ func (s *HTTPAPI) Route() {
 			r.Get("/blocks/{blockId}", handlers["GetBlockByID"].ServeHTTP)
 			r.Get("/executed-messages/{executedMessageId}", handlers["GetMessageByID"].ServeHTTP)
 			r.Route("/messages", func(r chi.Router) {
-				r.Get("/{messageId}", handlers["WaitForMessage"].ServeHTTP)
+				r.Get("/{messageId}/wait", handlers["WaitForMessage"].ServeHTTP)
 				r.Post("/", handlers["CreateMessage"].ServeHTTP)
 			})
 			r.Post("/signed-messages", handlers["SendSignedMessage"].ServeHTTP)

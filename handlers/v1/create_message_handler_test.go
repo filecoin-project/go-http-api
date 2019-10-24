@@ -40,7 +40,7 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 		handler.ServeHTTP(rr, req)
 
 		var executedMsg types.Message
-		expectedMsg.Kind = "message"
+		expectedMsg.Kind = "signedMessage"
 		expectedMsg.ID = "sll3525ieiaghaQOEI582slkd0LKDFIeoiwRDeus"
 		expectedMsg.From = "t27syykyps4puabw5fol3kn4n7flp44dz772hk3sq"
 		expectedMsg.Nonce = 878
@@ -97,8 +97,8 @@ func TestCreateMessageHandler_ServeHTTP(t *testing.T) {
 
 }
 
-func happyPathCMCallback(message *types.Message) (*types.Message, error) {
-	msg := types.Message{
+func happyPathCMCallback(message *types.Message) (*types.SignedMessage, error) {
+	msg := types.SignedMessage{
 		ID:         "sll3525ieiaghaQOEI582slkd0LKDFIeoiwRDeus",
 		Nonce:      878,
 		From:       "t27syykyps4puabw5fol3kn4n7flp44dz772hk3sq",
@@ -112,7 +112,7 @@ func happyPathCMCallback(message *types.Message) (*types.Message, error) {
 	return &msg, nil
 }
 
-func sadPathCMCallback(message *types.Message) (*types.Message, error) {
-	return &types.Message{}, errors.New("boom")
+func sadPathCMCallback(message *types.Message) (*types.SignedMessage, error) {
+	return &types.SignedMessage{}, errors.New("boom")
 
 }

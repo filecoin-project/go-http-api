@@ -11,7 +11,7 @@ import (
 
 // MessageHandler is the handler for the /chain/executed-messages/{executedMessageId} endpoint
 type MessageHandler struct {
-	Callback func(string) (*types.Message, error)
+	Callback func(string) (*types.SignedMessage, error)
 }
 
 // ServeHTTP handles an HTTP request.

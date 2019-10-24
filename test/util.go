@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/go-chi/chi"
@@ -124,19 +125,21 @@ func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path 
 
 // GetTestRequest sets up a request to uri with url params via httptest, calls the
 // provided handler, and returns the new recorder with the response stored.
-func GetTestRequest(uri string, params *[]Param, h http.Handler) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest("GET", uri, nil)
-	rr := httptest.NewRecorder()
+func GetTestRequest(getURL string, params *[]Param, h http.Handler) *httptest.ResponseRecorder {
 
 	rctx := chi.NewRouteContext()
+	purl := url.URL{}
 	if params != nil {
 		for _, el := range *params {
 			rctx.URLParams.Add(el.Key, el.Value)
+			purl.Query().Add(el.Value, el.Value)
 		}
 	}
 
+	req, _ := http.NewRequest("GET", getURL, strings.NewReader(purl.RawQuery))
 	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
 
+	rr := httptest.NewRecorder()
 	h.ServeHTTP(rr, req)
 	return rr
 }
