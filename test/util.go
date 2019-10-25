@@ -52,20 +52,22 @@ func RequireGetFreePort(t *testing.T) int {
 	return port
 }
 
-// RequireGetResponseBody fails the test if getResponseBody fails
+// RequireGetResponseBody fails the test if getResponseBody fails, when posted
+// to a test server
 func RequireGetResponseBody(t *testing.T, port int, path string) []byte {
 	uri := fmt.Sprintf("http://localhost:%d/api/filecoin/v1/%s", port, path)
 	return getResponseBody(t, uri)
 }
 
-// RequireGetResponseBodySSL fails the test if getResponseBody fails
+// RequireGetResponseBodySSL fails the test if getResponseBody fails, when posted
+// to a test server
 func RequireGetResponseBodySSL(t *testing.T, port int, path string) []byte {
 	uri := fmt.Sprintf("https://localhost:%d/api/filecoin/v1/%s", port, path)
 	return getResponseBody(t, uri)
 }
 
 // AssertGetResponseBody asserts that response body for a GET call using the provided
-// arguments equals `exp`
+// arguments equals `exp`, when posted to a test server
 func AssertGetResponseBody(t *testing.T, port int, ssl bool, path string, exp string) {
 	var body []byte
 
@@ -167,4 +169,15 @@ func AssertMarshaledEquals(t *testing.T, m Marshalable, exp string) {
 	marshaled, err := m.MarshalJSON()
 	require.NoError(t, err)
 	assert.Equal(t, exp, string(marshaled[:]))
+}
+
+// AssertEqualFuncs compares two funcs for equality
+func AssertEqualFuncs(t *testing.T, fn1, fn2 interface{}) {
+	assert.Equal(t, funcPtrAsString(fn1), funcPtrAsString(fn2))
+}
+
+// funcPtrAsString gets the pointer value of the func
+func funcPtrAsString(fn interface{}) string {
+	res := fmt.Sprintf("%v", fn)
+	return res
 }

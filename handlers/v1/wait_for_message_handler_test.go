@@ -2,7 +2,9 @@ package v1_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/filecoin-project/go-http-api/test/fixtures"
 	"github.com/stretchr/testify/require"
 	"math/big"
 	"net/http"
@@ -23,14 +25,13 @@ func TestNewWaitForMessageHandler(t *testing.T) {
 
 	t.Run("sets provided callback func", func(t *testing.T) {
 		wfmh := NewWaitForMessageHandler(cb)
-		AssertEqualFuncs(t, cb, wfmh.Callback)
+		test.AssertEqualFuncs(t, cb, wfmh.Callback)
 	})
 
 }
 
 func TestWaitForMessageHandler_ServeHTTP(t *testing.T) {
 	cid1 := test.RequireTestCID(t, []byte("cid1"))
-	cburl := "http://bigmoney-nowhammies.com/message-complete"
 	bh := big.NewInt(8)
 
 	uri := "http://localhost:5000/chain/messages/abcd1234/wait"
@@ -44,7 +45,6 @@ func TestWaitForMessageHandler_ServeHTTP(t *testing.T) {
 		params := &[]test.Param{
 			{Key: "msgCid", Value: cid1.String()},
 			{Key: "blockHeight", Value: bh.String()},
-			{Key: "callbackURL", Value: cburl},
 		}
 		rr := test.GetTestRequest(uri, params, &h)
 		assert.Equal(t, http.StatusOK, rr.Code)
@@ -76,17 +76,41 @@ func TestWaitForMessageHandler_ServeHTTP(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, rr.Code)
 		assert.Equal(t, expErr, rr.Body.String())
 	})
-}
 
-func TestPostToCallbackURL(t *testing.T) {
+	t.Run("If callback fails, returns error", func(t *testing.T) {
+		badHandler := WaitForMessageHandler{Callback: func(_ *cid.Cid, _ *big.Int) (message *types.SignedMessage, e error) {
+			return nil, errors.New("boom")
+		}}
+		params := &[]test.Param{
+			{Key: "msgCid", Value: cid1.String()},
+			{Key: "blockHeight", Value: bh.String()},
+		}
+		rr := test.GetTestRequest(uri, params, &badHandler)
+		expErr := `{"errors":["boom"]}`
+		assert.Equal(t, http.StatusInternalServerError, rr.Code)
+		assert.Equal(t, expErr, rr.Body.String())
 
-}
+	})
 
-func AssertEqualFuncs(t *testing.T, fn1, fn2 interface{}) {
-	assert.Equal(t, FuncPtrAsString(fn1), FuncPtrAsString(fn2))
-}
-
-func FuncPtrAsString(fn interface{}) string {
-	res := fmt.Sprintf("%v", fn)
-	return res
+	t.Run("endpoint can be called", func(t *testing.T) {
+		cid1 := test.RequireTestCID(t, []byte("cid1"))
+		bh := big.NewInt(8)
+		expMsg := types.SignedMessage{
+			ID:        cid1.String(),
+			Nonce:     10,
+			From:      fixtures.TestAddress0,
+			To:        fixtures.TestAddress1,
+			Value:     big.NewInt(0),
+			GasPrice:  big.NewInt(0),
+			GasLimit:  0,
+			Method:    "updatePeerID",
+			Signature: "somesig",
+		}
+		cb := func(_ *cid.Cid, _ *big.Int) (*types.SignedMessage, error) {
+			return &expMsg, nil
+		}
+		cbs := Callbacks{WaitForMessage: cb}
+		path := fmt.Sprintf("chain/messages/%s/wait?blockHeight=%s", cid1.String(), bh.String())
+		test.AssertServerResponse(t, &cbs, false, path, "foo")
+	})
 }

@@ -53,8 +53,7 @@ type Callbacks struct {
 	SendSignedMessage func(*types.SignedMessage) (*types.SignedMessage, error)
 
 	// WaitForMessage waits for a message to appear on chain until the given block height.
-	// When the message appears on chain, it posts to the callback URI with the block height and the message id as a JSON payload
-	WaitForMessage func(cid cid.Cid, bh *big.Int) (bH *big.Int, err error)
+	WaitForMessage func(*cid.Cid, *big.Int) (*types.SignedMessage, error)
 }
 
 // BuildHandlers takes a V1Callback struct and iterates over all
@@ -65,13 +64,13 @@ func (cb *Callbacks) BuildHandlers() *map[string]http.Handler {
 
 	numCallbacks := cb1t.NumField()
 	handlers := make(map[string]http.Handler, numCallbacks)
-
+	defH := &DefaultHandler{}
 	for i := 0; i < numCallbacks; i++ {
 		fieldName := cb1t.Field(i).Name
 
 		fieldValue := cb1v.Field(i)
 		if fieldValue.IsNil() {
-			handlers[fieldName] = &DefaultHandler{}
+			handlers[fieldName] = defH
 		} else {
 			switch fieldName {
 			case "GetBlockByID":
@@ -88,6 +87,8 @@ func (cb *Callbacks) BuildHandlers() *map[string]http.Handler {
 				handlers[fieldName] = &MessageHandler{Callback: cb.GetMessageByID}
 			case "GetNode":
 				handlers[fieldName] = &NodeHandler{Callback: cb.GetNode}
+			case "WaitForMessage":
+				handlers[fieldName] = &WaitForMessageHandler{Callback: cb.WaitForMessage}
 			default:
 				log.Errorf("skipping unknown handler: %s.", fieldName)
 			}

@@ -42,10 +42,6 @@ func (wfmh *WaitForMessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	}
 
 	msg, err := wfmh.Callback(reqParams.MsgCid, reqParams.BlockHeight)
-	if err != nil {
-		log.Error(err)
-		return
-	}
 	handlers.Respond(w, msg, err)
 }
 
