@@ -17,7 +17,7 @@ func TestNewHTTPServer(t *testing.T) {
 			s.Shutdown() // nolint: errcheck
 		}()
 
-		test.AssertGetResponseBody(t, 8080, false, "hello", "HELLO")
+		test.AssertGetResponseBodyEquals(t, 8080, false, "hello", "HELLO")
 	})
 }
 

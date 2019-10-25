@@ -47,19 +47,19 @@ func (wfmh *WaitForMessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 
 // getParams parses needed values from an http request
 func (wfmh *WaitForMessageHandler) getParams(r *http.Request) (WaitForMessageParams, error) {
-	param := chi.URLParam(r, "msgCid")
-	msgCid, err := cid.Decode(param)
+	mc := chi.URLParam(r, "messageCid")
+	msgCid, err := cid.Decode(mc)
 	if err != nil {
-		return WaitForMessageParams{}, fmt.Errorf("msgCid '%s': %s", param, err.Error())
+		return WaitForMessageParams{}, fmt.Errorf("messageCid '%s': %s", mc, err.Error())
 	}
 
-	param = chi.URLParam(r, "blockHeight")
-	bh, ok := big.NewInt(0).SetString(param, 10)
+	bh := r.FormValue("blockHeight")
+	blockH, ok := big.NewInt(0).SetString(bh, 10)
 	if !ok {
-		return WaitForMessageParams{}, fmt.Errorf("blockHeight '%s': failed to parse", param)
+		return WaitForMessageParams{}, fmt.Errorf("blockHeight '%s': failed to parse", bh)
 	}
 	return WaitForMessageParams{
 		MsgCid:      &msgCid,
-		BlockHeight: bh,
+		BlockHeight: blockH,
 	}, nil
 }

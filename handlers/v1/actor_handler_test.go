@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/big"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,9 +25,8 @@ func TestActor_ServeHTTP(t *testing.T) {
 		h := &v1.ActorHandler{Callback: func(actorId string) (*types.Actor, error) {
 			return fa, nil
 		}}
-		params := &[]test.Param{{Key: "actorId", Value: "1111"}}
 
-		rr := test.GetTestRequest(uri, params, h)
+		rr := test.GetTestRequest(uri, url.Values{}, h)
 		assert.Equal(t, http.StatusOK, rr.Code)
 
 		fa.Kind = "actor"
@@ -42,9 +42,8 @@ func TestActor_ServeHTTP(t *testing.T) {
 			return nil, errors.New("this is an error")
 		}
 		h := &v1.ActorHandler{Callback: acb}
-		params := &[]test.Param{{Key: "actorId", Value: "1111"}}
 
-		rr := test.GetTestRequest(uri, params, h)
+		rr := test.GetTestRequest(uri, url.Values{}, h)
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 		assert.Equal(t, errs, rr.Body.Bytes())
 	})

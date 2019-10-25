@@ -23,12 +23,6 @@ import (
 	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
 )
 
-// Param is a struct for constructing URL form params
-type Param struct {
-	Key   string
-	Value string
-}
-
 // GetFreePort gets a free port from the kernel
 // Credit: https://github.com/phayes/freeport
 func GetFreePort() (int, error) {
@@ -66,9 +60,9 @@ func RequireGetResponseBodySSL(t *testing.T, port int, path string) []byte {
 	return getResponseBody(t, uri)
 }
 
-// AssertGetResponseBody asserts that response body for a GET call using the provided
+// AssertGetResponseBodyEquals asserts that response body for a GET call using the provided
 // arguments equals `exp`, when posted to a test server
-func AssertGetResponseBody(t *testing.T, port int, ssl bool, path string, exp string) {
+func AssertGetResponseBodyEquals(t *testing.T, port int, ssl bool, path string, exp string) {
 	var body []byte
 
 	if ssl {
@@ -122,23 +116,22 @@ func AssertServerResponse(t *testing.T, callbacks *v1.Callbacks, ssl bool, path 
 	s.Run()
 	defer s.Shutdown() // nolint: errcheck
 
-	AssertGetResponseBody(t, s.Config().Port, ssl, path, exp)
+	AssertGetResponseBodyEquals(t, s.Config().Port, ssl, path, exp)
 }
 
 // GetTestRequest sets up a request to uri with url params via httptest, calls the
 // provided handler, and returns the new recorder with the response stored.
-func GetTestRequest(getURL string, params *[]Param, h http.Handler) *httptest.ResponseRecorder {
-
+func GetTestRequest(getURL string, params url.Values, h http.Handler) *httptest.ResponseRecorder {
 	rctx := chi.NewRouteContext()
-	purl := url.URL{}
+	req := httptest.NewRequest("GET", getURL, nil)
+	req.Form = params
+
+	// have to add the params to the chi context; otherwise chi doesn't know about them.
 	if params != nil {
-		for _, el := range *params {
-			rctx.URLParams.Add(el.Key, el.Value)
-			purl.Query().Add(el.Value, el.Value)
+		for k, v := range params {
+			rctx.URLParams.Add(k, strings.Join(v, ","))
 		}
 	}
-
-	req, _ := http.NewRequest("GET", getURL, strings.NewReader(purl.RawQuery))
 	req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
 
 	rr := httptest.NewRecorder()

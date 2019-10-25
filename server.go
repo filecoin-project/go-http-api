@@ -94,7 +94,7 @@ func (s *HTTPAPI) Route() {
 			r.Get("/blocks/{blockId}", handlers["GetBlockByID"].ServeHTTP)
 			r.Get("/executed-messages/{executedMessageId}", handlers["GetMessageByID"].ServeHTTP)
 			r.Route("/messages", func(r chi.Router) {
-				r.Get("/{messageId}/wait", handlers["WaitForMessage"].ServeHTTP)
+				r.Get("/{messageCid}/wait", handlers["WaitForMessage"].ServeHTTP)
 				r.Post("/", handlers["CreateMessage"].ServeHTTP)
 			})
 			r.Post("/signed-messages", handlers["SendSignedMessage"].ServeHTTP)
