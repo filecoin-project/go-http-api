@@ -42,6 +42,10 @@ curl http://localhost:5000/api/filecoin/v1/atcorz
 ```
  This standardizes unimplemented endpoint responses for every node, ensures the API endpoints are compliant with the [API spec](https://github.com/filecoin-project/filecoin-http-api), and more easily allows the API consumer to know what functionality is implemented -- or at least, what is exposed to the API -- by each node. 
 
+ The design also allows one to implement a proxy server that can communicate via its backend with a Filecoin cluster (if there are separate nodes for storage, retrieval, payments, proofs, mining, etc.) controlled by one operator, thus providing a single, externally accessible endpoint. Potential use cases include exchanges, block explorers, node control, or storage management.
+ 
+It is expected for this API to be useful for building a Filecoin implementation's command line interface.
+
 In order to be implementation-agnostic, this package uses its own Filecoin-based typestructs for callbacks and serialized responses.
 
 ### 2. Instantiate and run the server
