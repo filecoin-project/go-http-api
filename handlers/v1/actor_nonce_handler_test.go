@@ -20,7 +20,7 @@ func TestActorNonceHandler_ServeHTTP(t *testing.T) {
 		h := &v1.ActorNonceHandler{Callback: happyPathANCallback}
 		rr := test.GetTestRequest(uri, nil, h)
 		assert.Equal(t, http.StatusOK, rr.Code)
-		assert.Equal(t, "1234", rr.Body.String())
+		assert.Equal(t, "54321", rr.Body.String())
 	})
 
 	t.Run("returns error if callback fails", func(t *testing.T) {
@@ -32,20 +32,13 @@ func TestActorNonceHandler_ServeHTTP(t *testing.T) {
 	})
 
 	t.Run("returns actor nonce via server", func(t *testing.T) {
-		cbs := v1.Callbacks{GetActorNonce: happyPathANCallback}
-
-		s := test.CreateTestServer(t, &cbs, false).Run()
-		defer func() {
-			assert.NoError(t, s.Shutdown())
-		}()
-		body := test.RequireGetResponseBody(t, s.Config().Port, "actors/1234/nonce")
-
-		assert.Equal(t, "1234", string(body[:]))
+		cbs := &v1.Callbacks{GetActorNonce: happyPathANCallback}
+		test.AssertServerResponse(t, cbs, false, "actors/1234/nonce", "54321")
 	})
 }
 
 func happyPathANCallback(_ string) (*big.Int, error) {
-	return big.NewInt(1234), nil
+	return big.NewInt(54321), nil
 }
 
 func sadPathANCallback(_ string) (*big.Int, error) {

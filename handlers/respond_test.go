@@ -3,6 +3,7 @@ package handlers_test
 import (
 	"errors"
 	"github.com/filecoin-project/go-http-api/types"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -32,6 +33,12 @@ func TestRespond(t *testing.T) {
 
 		assert.Equal(t, http.StatusInternalServerError, rw.Code)
 		assert.Equal(t, types.MarshalError(err), rw.Body.Bytes())
+	})
+
+	t.Run("error from marshaling responds with serialized errors and server error", func(t *testing.T) {
+		rw := httptest.NewRecorder()
+		handlers.Respond(rw, math.Inf(1), nil)
+		assert.Equal(t, http.StatusInternalServerError, rw.Code)
 	})
 }
 

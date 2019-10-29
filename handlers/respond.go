@@ -17,11 +17,12 @@ func Respond(w http.ResponseWriter, result interface{}, cberr error) {
 		w.WriteHeader(http.StatusInternalServerError)
 		marshaled = types.MarshalError(cberr)
 	} else {
-		w.WriteHeader(http.StatusOK)
 		if marshaled, err = json.Marshal(result); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			log.Error(err)
 			return
 		}
+		w.WriteHeader(http.StatusOK)
 	}
 
 	if _, err := fmt.Fprint(w, string(marshaled[:])); err != nil {

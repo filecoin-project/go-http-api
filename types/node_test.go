@@ -11,7 +11,7 @@ import (
 func TestNode_MarshalJSON(t *testing.T) {
 	t.Run("full struct is serialized correctly and includes Kind", func(t *testing.T) {
 		n := Node{
-			Id:           "abcd123",
+			ID:           "abcd123",
 			Addresses:    []string{fixtures.TestAddress0, fixtures.TestAddress1},
 			Version:      "1",
 			Commit:       "somehash",

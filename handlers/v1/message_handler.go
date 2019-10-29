@@ -11,13 +11,13 @@ import (
 
 // MessageHandler is the handler for the /chain/executed-messages/{executedMessageId} endpoint
 type MessageHandler struct {
-	Callback func(string) (*types.Message, error)
+	Callback func(string) (*types.SignedMessage, error)
 }
 
 // ServeHTTP handles an HTTP request.
 func (mh *MessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	msgId := chi.URLParam(r, "messageId")
+	msgID := chi.URLParam(r, "messageId")
 
-	msg, err := mh.Callback(msgId)
+	msg, err := mh.Callback(msgID)
 	handlers.Respond(w, msg, err)
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/big"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/ipfs/go-cid"
@@ -19,13 +20,12 @@ import (
 
 func TestBlockHandler_ServeHTTP(t *testing.T) {
 	uri := "http://chain/blocks/1111"
-	params := []test.Param{{Key: "blockId", Value: "1111"}}
 	t.Run("returns a block and status ok", func(t *testing.T) {
 		tb := requireCreateTestBlock(t, fixtures.TestAddress1)
 		h := &v1.BlockHandler{Callback: func(blockId string) (*types.Block, error) {
 			return tb, nil
 		}}
-		rr := test.GetTestRequest(uri, &params, h)
+		rr := test.GetTestRequest(uri, url.Values{}, h)
 
 		assert.Equal(t, http.StatusOK, rr.Code)
 
@@ -39,7 +39,7 @@ func TestBlockHandler_ServeHTTP(t *testing.T) {
 		h := &v1.BlockHandler{Callback: func(blockId string) (*types.Block, error) {
 			return &types.Block{}, err
 		}}
-		rr := test.GetTestRequest(uri, &params, h)
+		rr := test.GetTestRequest(uri, url.Values{}, h)
 		assert.Equal(t, http.StatusInternalServerError, rr.Code)
 
 		expected := types.MarshalError(err)
