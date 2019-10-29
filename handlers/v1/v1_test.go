@@ -3,8 +3,12 @@ package v1_test
 import (
 	"fmt"
 	v1 "github.com/filecoin-project/go-http-api/handlers/v1"
+	"github.com/filecoin-project/go-http-api/test"
+	"github.com/go-chi/chi"
 	"github.com/stretchr/testify/assert"
+	"net/http"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -25,4 +29,17 @@ func TestCallbacks_BuildHandlers(t *testing.T) {
 			assert.Equal(t, &v1.DefaultHandler{}, hlers[fieldName])
 		})
 	}
+}
+
+// Check that the route is specified well
+func TestRouteWalk(t *testing.T) {
+	ts := test.CreateTestServer(t, &test.HappyPathCallbacks, false)
+
+	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		route = strings.Replace(route, "/*/", "/", -1)
+		fmt.Printf("%s %s\n", method, route)
+		return nil
+	}
+
+	assert.NoError(t, chi.Walk(ts.Router(), walkFunc))
 }

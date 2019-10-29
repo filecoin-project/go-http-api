@@ -114,7 +114,7 @@ func (s *HTTPAPI) Shutdown() error {
 	return s.srv.Shutdown(s.ctx)
 }
 
-// Router returns the chimux
+// Router returns the chimux router.  Currently used for testing (see server_test)
 func (s *HTTPAPI) Router() chi.Router {
 	return s.chimux
 }
